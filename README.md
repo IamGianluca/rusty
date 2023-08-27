@@ -1,3 +1,11 @@
+### Rusty 
+
+`rusty` is a toy project aimed at learning Rust. The scope of this project is to create the backend for a simple instant messaging app, like Slack or Discord.
+
+### System Design
+
+To be confirmed.
+
 ### How to contribute
 
 This is really a pet project to learn Rust, so I'm not expecting anyone to be seriously interested in contributing. That said, if you are, please respect this naming convention to tag your commits:
