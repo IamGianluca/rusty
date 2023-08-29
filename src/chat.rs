@@ -32,6 +32,7 @@ mod test {
         let mut chat1 = Chat::new(String::from("company1"));
         let user1 = create_user(String::from("user1"));
         chat1.register_user(user1);
-        assert_eq!(chat1.users[0].name, "user1")
+        assert_eq!(chat1.users.len(), 1);
+        assert_eq!(chat1.users[0].name, "user1");
     }
 }
