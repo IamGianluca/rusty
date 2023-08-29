@@ -19,7 +19,8 @@ impl Chat {
 #[cfg(test)]
 mod test {
 
-    use crate::{chat::Chat, user::create_user};
+    use crate::chat::Chat;
+    use crate::user::User;
 
     #[test]
     fn test_create_chat() {
@@ -30,7 +31,7 @@ mod test {
     #[test]
     fn test_register_user() {
         let mut chat1 = Chat::new(String::from("company1"));
-        let user1 = create_user(String::from("user1"));
+        let user1 = User::new(String::from("user1"));
         chat1.register_user(user1);
         assert_eq!(chat1.users.len(), 1);
         assert_eq!(chat1.users[0].name, "user1");
