@@ -21,3 +21,11 @@ This is really a pet project to learn Rust, so I'm not expecting anyone to be se
 * `build`: Commits that affect build components like build tool, CI pipeline, dependencies, project version, ...
 * `ops`: Commits that affect operational components like infrastructure, deployment, backup, recovery, ...
 * `chore`: Miscellaneous commits e.g. modifying `.gitignore`
+
+### TODO
+
+- [ ] Desktop Client: The app our users will use 
+- [ ] Message Server: Listens to updates from the backend server. Fans out real-time events to all clients (within a workspace)
+- [ ] Backend Server: Contains the core logic of our messaging app. Knows what a user, workspace, channel are and how they interact. Knows about the message server and the DB and how to talk to them
+- [ ] Storage Layer: Persist everything that happens within the messaging app
+- [ ] Load testing
