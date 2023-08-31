@@ -2,21 +2,23 @@ use std::collections::HashMap;
 
 use crate::User;
 
-#[derive(Debug)]
 pub struct ChatClient {
     namespace: String,
     users: HashMap<String, User>,
 }
 
 impl ChatClient {
-    fn new(namespace: String) -> ChatClient {
+    pub fn new(namespace: String) -> ChatClient {
+        println!("Created new chat.");
         ChatClient {
             namespace,
             users: HashMap::new(),
         }
     }
-    fn register_user(&mut self, user: User) {
+    pub fn register_user(&mut self, user: User) {
+        let username = user.name.clone();
         self.users.insert(user.name.to_string(), user);
+        println!("User {0} was successfully registered.", username)
     }
 }
 
