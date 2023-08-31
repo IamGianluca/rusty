@@ -2,55 +2,51 @@ use std::collections::HashMap;
 
 use crate::User;
 
-pub struct ChatClient {
-    namespace: String,
+pub struct BackendServer {
+    workspace: String,
     users: HashMap<String, User>,
 }
 
-impl ChatClient {
-    pub fn new(namespace: String) -> ChatClient {
-        println!("Created new chat.");
-        ChatClient {
-            namespace,
+impl BackendServer {
+    pub fn new(workspace: String) -> BackendServer {
+        println!("Creating new chat.");
+        BackendServer {
+            workspace,
             users: HashMap::new(),
         }
     }
-    pub fn register_user(&mut self, user: User) {
-        let username = user.name.clone();
+    pub fn create_user(&mut self, name: String) {
+        let user = User::new(name);
+        println!("Creating new user.");
         self.users.insert(user.name.to_string(), user);
-        println!("User {0} was successfully registered.", username)
     }
 }
 
 #[cfg(test)]
 mod test {
 
-    use crate::chat::ChatClient;
-    use crate::user::User;
+    use crate::chat::BackendServer;
 
     #[test]
     fn test_create_chat() {
-        let chat1 = ChatClient::new(String::from("company1"));
-        assert_eq!(chat1.namespace, "company1");
+        let chat1 = BackendServer::new(String::from("company1"));
+        assert_eq!(chat1.workspace, "company1");
     }
 
     #[test]
     fn test_register_user() {
-        let mut chat = ChatClient::new(String::from("company1"));
-        let user1 = User::new(String::from("user1"));
-        chat.register_user(user1);
+        let mut chat = BackendServer::new(String::from("company1"));
+        chat.create_user("user1".to_string());
         assert_eq!(chat.users.len(), 1);
         assert_eq!(chat.users.contains_key("user1"), true);
     }
+
     #[test]
     fn test_register_multiple_users() {
-        let mut chat = ChatClient::new(String::from("company1"));
-        let user1 = User::new(String::from("user1"));
-        let user2 = User::new(String::from("user2"));
-        let user3 = User::new(String::from("user3"));
-        chat.register_user(user1);
-        chat.register_user(user2);
-        chat.register_user(user3);
+        let mut chat = BackendServer::new(String::from("company1"));
+        chat.create_user("user1".to_string());
+        chat.create_user("user2".to_string());
+        chat.create_user("user3".to_string());
         assert_eq!(chat.users.len(), 3);
         for user_id in ["user1", "user2", "user3"] {
             assert_eq!(chat.users.contains_key(user_id), true)
