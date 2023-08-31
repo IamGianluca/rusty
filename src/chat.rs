@@ -4,21 +4,38 @@ use crate::User;
 
 pub struct BackendServer {
     workspace: String,
+    channels: HashMap<String, Channel>,
     users: HashMap<String, User>,
 }
 
 impl BackendServer {
     pub fn new(workspace: String) -> BackendServer {
         println!("Creating new chat.");
-        BackendServer {
+        let mut chat = BackendServer {
             workspace,
+            channels: HashMap::new(),
             users: HashMap::new(),
-        }
+        };
+        chat.create_channel("general".to_string());
+        chat
+    }
+    pub fn create_channel(&mut self, name: String) {
+        let channel = Channel::new(name);
+        self.channels.insert(channel.name.to_string(), channel);
     }
     pub fn create_user(&mut self, name: String) {
         let user = User::new(name);
         println!("Creating new user.");
         self.users.insert(user.name.to_string(), user);
+    }
+}
+pub struct Channel {
+    name: String,
+}
+
+impl Channel {
+    pub fn new(name: String) -> Channel {
+        Channel { name }
     }
 }
 
@@ -48,8 +65,25 @@ mod test {
         chat.create_user("user2".to_string());
         chat.create_user("user3".to_string());
         assert_eq!(chat.users.len(), 3);
-        for user_id in ["user1", "user2", "user3"] {
-            assert_eq!(chat.users.contains_key(user_id), true)
+        for user_name in ["user1", "user2", "user3"] {
+            assert_eq!(chat.users.contains_key(user_name), true)
+        }
+    }
+
+    #[test]
+    fn test_chat_starts_with_general_channel() {
+        let chat = BackendServer::new(String::from("company1"));
+        assert_eq!(chat.channels.len(), 1);
+        assert_eq!(chat.channels.contains_key("general"), true)
+    }
+
+    #[test]
+    fn test_create_channel() {
+        let mut chat = BackendServer::new(String::from("company1"));
+        chat.create_channel("channel1".to_string());
+        assert_eq!(chat.channels.len(), 2);
+        for channel_name in ["general", "channel1"] {
+            assert_eq!(chat.channels.contains_key(channel_name), true)
         }
     }
 }
