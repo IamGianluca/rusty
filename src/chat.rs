@@ -34,7 +34,7 @@ mod test {
     }
 
     #[test]
-    fn test_register_user() {
+    fn test_create_user() {
         let mut chat = BackendServer::new(String::from("company1"));
         chat.create_user("user1".to_string());
         assert_eq!(chat.users.len(), 1);
@@ -42,7 +42,7 @@ mod test {
     }
 
     #[test]
-    fn test_register_multiple_users() {
+    fn test_create_multiple_users() {
         let mut chat = BackendServer::new(String::from("company1"));
         chat.create_user("user1".to_string());
         chat.create_user("user2".to_string());
