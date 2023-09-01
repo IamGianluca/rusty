@@ -3,6 +3,7 @@ use std::io;
 use crate::{chat::BackendServer, user::User};
 
 mod chat;
+mod client;
 mod user;
 
 fn main() {

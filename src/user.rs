@@ -9,7 +9,7 @@ impl User {
 }
 
 #[cfg(test)]
-mod tests {
+mod test {
 
     use crate::user::User;
 
