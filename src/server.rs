@@ -1,17 +1,17 @@
 use std::collections::HashMap;
 
-use crate::User;
+use crate::user::User;
 
-pub struct BackendServer {
+pub struct ChatServer {
     workspace: String,
     channels: HashMap<String, Channel>,
     users: HashMap<String, User>,
 }
 
-impl BackendServer {
-    pub fn new(workspace: String) -> BackendServer {
+impl ChatServer {
+    pub fn new(workspace: String) -> ChatServer {
         println!("Creating new chat.");
-        let mut chat = BackendServer {
+        let mut chat = ChatServer {
             workspace,
             channels: HashMap::new(),
             users: HashMap::new(),
@@ -42,17 +42,17 @@ impl Channel {
 #[cfg(test)]
 mod test {
 
-    use crate::chat::BackendServer;
+    use crate::server::ChatServer;
 
     #[test]
     fn test_create_chat() {
-        let chat1 = BackendServer::new(String::from("company1"));
+        let chat1 = ChatServer::new(String::from("company1"));
         assert_eq!(chat1.workspace, "company1");
     }
 
     #[test]
     fn test_create_user() {
-        let mut chat = BackendServer::new(String::from("company1"));
+        let mut chat = ChatServer::new(String::from("company1"));
         chat.create_user("user1".to_string());
         assert_eq!(chat.users.len(), 1);
         assert_eq!(chat.users.contains_key("user1"), true);
@@ -60,7 +60,7 @@ mod test {
 
     #[test]
     fn test_create_multiple_users() {
-        let mut chat = BackendServer::new(String::from("company1"));
+        let mut chat = ChatServer::new(String::from("company1"));
         chat.create_user("user1".to_string());
         chat.create_user("user2".to_string());
         chat.create_user("user3".to_string());
@@ -72,14 +72,14 @@ mod test {
 
     #[test]
     fn test_chat_starts_with_general_channel() {
-        let chat = BackendServer::new(String::from("company1"));
+        let chat = ChatServer::new(String::from("company1"));
         assert_eq!(chat.channels.len(), 1);
         assert_eq!(chat.channels.contains_key("general"), true)
     }
 
     #[test]
     fn test_create_channel() {
-        let mut chat = BackendServer::new(String::from("company1"));
+        let mut chat = ChatServer::new(String::from("company1"));
         chat.create_channel("channel1".to_string());
         assert_eq!(chat.channels.len(), 2);
         for channel_name in ["general", "channel1"] {

@@ -1,9 +1,9 @@
 use std::io;
 
-use crate::{chat::BackendServer, user::User};
+use crate::server::ChatServer;
 
-mod chat;
 mod client;
+mod server;
 mod user;
 
 fn main() {
@@ -15,7 +15,7 @@ fn main() {
         .read_line(&mut workspace)
         .expect("Failed to read line.");
     let workspace = workspace.trim().to_string();
-    let mut chat = BackendServer::new(String::from(workspace));
+    let mut chat = ChatServer::new(String::from(workspace));
 
     println!("Please input your name.");
     let mut username = String::new();
