@@ -1,6 +1,6 @@
 ### Rusty 
 
-`rusty` is a toy project aimed at learning Rust. The scope of this project is to create the backend for a simple instant messaging app, like Slack or Discord.
+`rusty` is a pet project aimed at learning Rust. The scope of this project is to create the backend for a simple instant messaging app, like Slack or Discord.
 
 ### System Design
 
