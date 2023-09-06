@@ -28,14 +28,38 @@ impl ChatServer {
         println!("Creating new user.");
         self.users.insert(user.name.to_string(), user);
     }
+
+    pub fn send_message(&mut self, user: String, channel: String, message: String) {
+        let ch = self.channels.get_mut(&channel).unwrap();
+        ch.add_message(user, message);
+    }
 }
 pub struct Channel {
     name: String,
+    messages: Vec<Message>,
 }
 
 impl Channel {
     pub fn new(name: String) -> Channel {
-        Channel { name }
+        Channel {
+            name,
+            messages: Vec::new(),
+        }
+    }
+    pub fn add_message(&mut self, sender: String, text: String) {
+        let msg = Message::new(sender, text);
+        self.messages.push(msg);
+    }
+}
+
+pub struct Message {
+    sender: String,
+    text: String,
+}
+
+impl Message {
+    pub fn new(sender: String, text: String) -> Message {
+        Message { sender, text }
     }
 }
 
@@ -85,5 +109,20 @@ mod test {
         for channel_name in ["general", "channel1"] {
             assert_eq!(chat.channels.contains_key(channel_name), true)
         }
+    }
+
+    #[test]
+    fn test_send_message() {
+        let mut chat = ChatServer::new("company1".to_string());
+        chat.send_message(
+            "user1".to_string(),
+            "general".to_string(),
+            "hello world!".to_string(),
+        );
+        let msg = &chat.channels.get("general").unwrap().messages[0];
+        let text = &msg.text;
+        let sender = &msg.sender;
+        assert_eq!(text, "hello world!");
+        assert_eq!(sender, "user1");
     }
 }
