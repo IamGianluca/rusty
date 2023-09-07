@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::user::User;
+use crate::domain::user::User;
 
 pub struct TokenUserTable {
     token2username: HashMap<String, String>,

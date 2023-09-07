@@ -11,7 +11,7 @@ impl User {
 #[cfg(test)]
 mod test {
 
-    use crate::user::User;
+    use crate::domain::user::User;
 
     #[test]
     fn test_create_user() {

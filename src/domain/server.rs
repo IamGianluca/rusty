@@ -1,13 +1,12 @@
 use std::collections::HashMap;
 
-use crate::user::User;
+use crate::domain::user::User;
 
 pub struct ChatServer {
     workspace: String,
     channels: HashMap<String, Channel>,
     users: HashMap<String, User>,
 }
-
 impl ChatServer {
     pub fn new(workspace: String) -> ChatServer {
         println!("Creating new chat.");
@@ -34,11 +33,11 @@ impl ChatServer {
         ch.add_message(user, message);
     }
 }
+
 pub struct Channel {
     name: String,
     messages: Vec<Message>,
 }
-
 impl Channel {
     pub fn new(name: String) -> Channel {
         Channel {
@@ -56,7 +55,6 @@ pub struct Message {
     sender: String,
     text: String,
 }
-
 impl Message {
     pub fn new(sender: String, text: String) -> Message {
         Message { sender, text }
@@ -65,8 +63,7 @@ impl Message {
 
 #[cfg(test)]
 mod test {
-
-    use crate::server::ChatServer;
+    use crate::domain::server::ChatServer;
 
     #[test]
     fn test_create_chat() {
