@@ -24,8 +24,8 @@ This is really a pet project to learn Rust, so I'm not expecting anyone to be se
 
 ### TODO
 
-- [ ] Desktop Client: The app our users will use 
-- [ ] Message Server: Listens to updates from the backend server. Fans out real-time events to all clients (within a workspace)
 - [ ] Backend Server: Contains the core logic of our messaging app. Knows what a user, workspace, channel are and how they interact. Knows about the message server and the DB and how to talk to them
 - [ ] Storage Layer: Persist everything that happens within the messaging app
+- [ ] Message Server: Listens to updates from the backend server. Fans out real-time events to all clients (within a workspace)
+- [ ] Desktop Client: The app our users will use 
 - [ ] Load testing
