@@ -95,7 +95,7 @@ mod test {
     }
 
     #[test]
-    fn test_chat_starts_with_general_channel() {
+    fn test_chat_starts_with_default_channel() {
         let chat = ChatServer::new(String::from("company1"));
         assert_eq!(chat.channels.len(), 1);
         assert_eq!(chat.channels.contains_key("general"), true)
@@ -120,9 +120,7 @@ mod test {
             "hello world!".to_string(),
         );
         let msg = &chat.channels.get("general").unwrap().messages[0];
-        let text = &msg.text;
-        let sender = &msg.sender;
-        assert_eq!(text, "hello world!");
-        assert_eq!(sender, "user1");
+        assert_eq!(&msg.text, "hello world!");
+        assert_eq!(&msg.sender, "user1");
     }
 }
