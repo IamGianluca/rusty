@@ -123,4 +123,25 @@ mod test {
         assert_eq!(&msg.text, "hello world!");
         assert_eq!(&msg.sender, "user1");
     }
+
+    #[test]
+    fn test_send_multiple_messages_preserve_order() {
+        let mut chat = ChatServer::new("company1".to_string());
+        chat.send_message(
+            "user1".to_string(),
+            "general".to_string(),
+            "hello world!".to_string(),
+        );
+        chat.send_message(
+            "user2".to_string(),
+            "general".to_string(),
+            "life is great".to_string(),
+        );
+        let msg = &chat.channels.get("general").unwrap().messages[0];
+        assert_eq!(&msg.text, "hello world!");
+        assert_eq!(&msg.sender, "user1");
+        let msg = &chat.channels.get("general").unwrap().messages[1];
+        assert_eq!(&msg.text, "life is great");
+        assert_eq!(&msg.sender, "user2");
+    }
 }
