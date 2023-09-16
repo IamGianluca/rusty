@@ -1,10 +1,9 @@
 use std::io;
 
-use crate::server::ChatServer;
+use crate::domain::server::ChatServer;
 
 mod client;
-mod server;
-mod user;
+pub mod domain;
 
 fn main() {
     println!("I'm a little rusty with Rust!");
