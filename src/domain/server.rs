@@ -76,7 +76,7 @@ mod test {
         let mut chat = ChatServer::new(String::from("company1"));
         chat.create_user("user1".to_string());
         assert_eq!(chat.users.len(), 1);
-        assert_eq!(chat.users.contains_key("user1"), true);
+        assert!(chat.users.contains_key("user1"));
     }
 
     #[test]
@@ -87,7 +87,7 @@ mod test {
         chat.create_user("user3".to_string());
         assert_eq!(chat.users.len(), 3);
         for user_name in ["user1", "user2", "user3"] {
-            assert_eq!(chat.users.contains_key(user_name), true)
+            assert!(chat.users.contains_key(user_name))
         }
     }
 
@@ -95,7 +95,7 @@ mod test {
     fn test_chat_starts_with_default_channel() {
         let chat = ChatServer::new(String::from("company1"));
         assert_eq!(chat.channels.len(), 1);
-        assert_eq!(chat.channels.contains_key("general"), true)
+        assert!(chat.channels.contains_key("general"))
     }
 
     #[test]
@@ -104,7 +104,7 @@ mod test {
         chat.create_channel("channel1".to_string());
         assert_eq!(chat.channels.len(), 2);
         for channel_name in ["general", "channel1"] {
-            assert_eq!(chat.channels.contains_key(channel_name), true)
+            assert!(chat.channels.contains_key(channel_name))
         }
     }
 

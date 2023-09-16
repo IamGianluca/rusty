@@ -44,7 +44,7 @@ mod test {
     #[test]
     fn test_login() {
         let response = Client::new("token".to_string());
-        assert_eq!(response.is_ok(), true);
+        assert!(response.is_ok());
         let client = response.unwrap();
         assert_eq!(client.user.name, "luca")
     }
