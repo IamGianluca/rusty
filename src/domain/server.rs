@@ -67,8 +67,8 @@ mod test {
 
     #[test]
     fn test_create_chat() {
-        let chat1 = ChatServer::new(String::from("company1"));
-        assert_eq!(chat1.workspace, "company1");
+        let chat = ChatServer::new(String::from("company1"));
+        assert_eq!(chat.workspace, "company1");
     }
 
     #[test]
