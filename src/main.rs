@@ -2,6 +2,7 @@ use std::io;
 
 use crate::domain::server::ChatServer;
 
+pub mod adapters;
 mod client;
 pub mod domain;
 

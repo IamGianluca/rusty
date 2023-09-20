@@ -1,21 +1,38 @@
+use crate::adapters::schema::users;
+use chrono::Utc;
+use diesel::prelude::*;
+
+#[derive(Debug, Queryable, Selectable)]
+#[diesel(table_name = users)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct User {
-    pub name: String,
+    pub id: i32,
+    pub username: String,
+    pub email: String,
+    pub created_at: chrono::DateTime<Utc>,
 }
 
-impl User {
-    pub fn new(name: String) -> User {
-        User { name }
-    }
+#[derive(Insertable)]
+#[diesel(table_name = users)]
+pub struct NewUser<'a> {
+    pub username: &'a String,
+    pub email: &'a String,
 }
 
 #[cfg(test)]
 mod test {
 
     use crate::domain::user::User;
+    use chrono::Utc;
 
     #[test]
     fn test_create_user() {
-        let user1 = User::new(String::from("user1"));
-        assert_eq!(user1.name, "user1")
+        let user1 = User {
+            id: 1,
+            username: String::from("user1"),
+            email: "fake@email.com".to_string(),
+            created_at: Utc::now(),
+        };
+        assert_eq!(user1.username, "user1")
     }
 }

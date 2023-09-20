@@ -3,14 +3,14 @@ CREATE TABLE channels (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE users (
   id SERIAL PRIMARY KEY,
   username TEXT NOT NULL,
-  email TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL
+  email TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE messages (
@@ -18,5 +18,5 @@ CREATE TABLE messages (
   channel_id INT REFERENCES channels(id),
   user_id INT REFERENCES users(id),
   content TEXT NOT NULL,
-  timestamp TIMESTAMPTZ NOT NULL
+  timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 )

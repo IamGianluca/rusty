@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use chrono::Utc;
+
 use crate::domain::user::User;
 
 pub struct TokenUserTable {
@@ -25,10 +27,13 @@ impl Client {
 
         match &table.token2username.get(&token.to_string()) {
             None => return Err("Wrong access token".to_string()),
-            Some(user) => {
+            Some(_) => {
                 return Ok(Client {
                     user: User {
-                        name: user.to_string(),
+                        id: 1,
+                        username: "Jane Doe".to_string(),
+                        email: "johndoe@example.com".to_string(),
+                        created_at: Utc::now(),
                     },
                 })
             }
@@ -46,7 +51,7 @@ mod test {
         let response = Client::new("token".to_string());
         assert!(response.is_ok());
         let client = response.unwrap();
-        assert_eq!(client.user.name, "luca")
+        assert_eq!(client.user.username, "Jane Doe")
     }
 
     #[test]
