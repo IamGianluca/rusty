@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use chrono::Utc;
+
 use crate::domain::user::User;
 
 pub struct ChatServer {
@@ -23,9 +25,14 @@ impl ChatServer {
         self.channels.insert(channel.name.to_string(), channel);
     }
     pub fn create_user(&mut self, name: String) {
-        let user = User::new(name);
+        let user = User {
+            id: 1,
+            username: name,
+            email: "test@test.com".to_string(),
+            created_at: Utc::now(),
+        };
         println!("Creating new user.");
-        self.users.insert(user.name.to_string(), user);
+        self.users.insert(user.username.to_string(), user);
     }
 
     pub fn send_message(&mut self, user: String, channel: String, message: String) {
