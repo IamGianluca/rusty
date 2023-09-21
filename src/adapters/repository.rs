@@ -6,18 +6,17 @@ use std::error::Error;
 
 use super::schema::users;
 
-struct UserRepository {
-    connection: PgConnection,
+struct UserRepository<'a> {
+    connection: &'a mut PgConnection,
 }
 
-impl UserRepository {
-    fn new(url: &str) -> Self {
-        let conn = diesel::Connection::establish(url).unwrap();
-        Self { connection: conn }
+impl<'a> UserRepository<'a> {
+    fn new(connection: &'a mut PgConnection) -> Self {
+        UserRepository { connection }
     }
 
     fn get_user(&mut self, id: i32) -> Result<User, Box<dyn Error + 'static>> {
-        let user: User = users::table.find(id).first(&mut self.connection)?;
+        let user: User = users::table.find(id).first(&mut *self.connection)?;
         Ok(User {
             id: user.id,
             username: user.username,
@@ -31,7 +30,7 @@ impl UserRepository {
 
         diesel::insert_into(users)
             .values(user)
-            .execute(&mut self.connection)?;
+            .execute(&mut *self.connection)?;
 
         Ok(())
     }
@@ -41,26 +40,39 @@ impl UserRepository {
 mod test {
     use crate::adapters::repository::UserRepository;
     use crate::domain::user::NewUser;
+    use diesel::prelude::*;
     use dotenvy::dotenv;
     use std::env;
 
+    fn rebuild_db() {
+        use std::process::Command;
+        Command::new("diesel")
+            .arg("migration")
+            .arg("redo")
+            .output()
+            .expect("Something is wrong");
+    }
+
     #[test]
     fn test_create_user_via_repository() {
+        // given
+        rebuild_db();
         dotenv().ok();
+        let database_url =
+            env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set.");
+        let conn = &mut PgConnection::establish(&database_url)
+            .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
 
-        let binding = env::var("DATABASE_URL").unwrap();
-        let connection = binding.as_str();
-        let mut repo = UserRepository::new(connection);
-
-        // save a user
+        // when
+        let mut repo = UserRepository::new(conn);
         let user = NewUser {
             username: &"John Doe".to_string(),
             email: &"johndoe@example.com".to_string(),
         };
         repo.save_user(&user).unwrap();
 
-        // get a user by id
+        // then
         let user = repo.get_user(1).unwrap();
-        println!("{}", user.username);
+        assert_eq!(user.username, "John Doe")
     }
 }
