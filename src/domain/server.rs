@@ -1,3 +1,4 @@
+use crate::domain::channel::Channel;
 use crate::domain::user::User;
 use chrono::Utc;
 use std::collections::HashMap;
@@ -38,33 +39,6 @@ impl ChatServer {
     pub fn send_message(&mut self, user: String, channel: String, message: String) {
         let ch = self.channels.get_mut(&channel).unwrap();
         ch.add_message(user, message);
-    }
-}
-
-pub struct Channel {
-    name: String,
-    messages: Vec<Message>,
-}
-impl Channel {
-    pub fn new(name: String) -> Channel {
-        Channel {
-            name,
-            messages: Vec::new(),
-        }
-    }
-    pub fn add_message(&mut self, sender: String, text: String) {
-        let msg = Message::new(sender, text);
-        self.messages.push(msg);
-    }
-}
-
-pub struct Message {
-    sender: String,
-    text: String,
-}
-impl Message {
-    pub fn new(sender: String, text: String) -> Message {
-        Message { sender, text }
     }
 }
 

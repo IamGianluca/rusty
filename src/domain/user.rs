@@ -22,16 +22,13 @@ pub struct NewUser<'a> {
 #[cfg(test)]
 mod test {
 
-    use crate::domain::user::User;
-    use chrono::Utc;
+    use crate::domain::user::NewUser;
 
     #[test]
     fn test_create_user() {
-        let user1 = User {
-            id: 1,
-            username: String::from("user1"),
-            email: "fake@email.com".to_string(),
-            created_at: Utc::now(),
+        let user1 = NewUser {
+            username: &"user1".to_string(),
+            email: &"fake@email.com".to_string(),
         };
         assert_eq!(user1.username, "user1")
     }
