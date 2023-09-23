@@ -1,5 +1,4 @@
 use crate::domain::user::{NewUser, User};
-use chrono::Utc;
 use diesel::prelude::*;
 use diesel::{self, PgConnection};
 use std::error::Error;
@@ -14,24 +13,19 @@ impl<'a> UserRepository<'a> {
     fn new(connection: &'a mut PgConnection) -> Self {
         UserRepository { connection }
     }
+
     fn get_user(&mut self, id: i32) -> Result<User, Box<dyn Error + 'static>> {
         let user: User = users::table.find(id).first(&mut *self.connection)?;
-        Ok(User {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            created_at: Utc::now(),
-        })
+        Ok(user)
     }
 
-    fn save_user(&mut self, user: &NewUser) -> Result<(), Box<dyn Error + 'static>> {
+    fn save_user(&mut self, user: &NewUser) -> Result<User, Box<dyn Error + 'static>> {
         use crate::adapters::schema::users::dsl::*;
 
-        diesel::insert_into(users)
+        let inserted_user = diesel::insert_into(users)
             .values(user)
-            .execute(&mut *self.connection)?;
-
-        Ok(())
+            .get_result::<User>(&mut *self.connection)?;
+        Ok(inserted_user)
     }
 }
 
@@ -64,6 +58,7 @@ mod test {
         PgConnection::establish(&database_url)
             .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
     }
+
     #[test]
     fn test_create_method() {
         // given
@@ -92,5 +87,24 @@ mod test {
 
         // then
         assert_eq!(result.is_ok(), false)
+    }
+
+    #[test]
+    fn test_get_user_that_was_just_added() {
+        // given
+        let conn = &mut get_database_connection();
+
+        let mut repo = UserRepository::new(conn);
+        let user = NewUser {
+            username: &"John Doe".to_string(),
+            email: &"johndoe@example.com".to_string(),
+        };
+        let inserted_user = repo.save_user(&user).unwrap();
+
+        // when
+        let retrieved_user = repo.get_user(inserted_user.id).unwrap();
+
+        // then
+        assert_eq!(retrieved_user.username, inserted_user.username)
     }
 }
