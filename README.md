@@ -20,6 +20,13 @@ This is really a pet project to learn Rust, so I'm not expecting anyone to be se
 * `ops`: Commits that affect operational components like infrastructure, deployment, backup, recovery, ...
 * `chore`: Miscellaneous commits e.g. modifying `.gitignore`
 
+### Tools
+
+- Docker
+- [Cargo](https://github.com/rust-lang/cargo)
+- [Diesel](https://github.com/diesel-rs/diesel)
+- [Actix Web](https://github.com/actix/actix-web)
+
 ### TODO
 
 - [ ] Web Framework: That can be used by clients to communicate with the backend server
