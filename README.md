@@ -2,9 +2,7 @@
 
 `rusty` is a pet project aimed at learning Rust. The scope of this project is to create the backend for a simple instant messaging app, like Slack or Discord.
 
-### System Design
-
-To be confirmed.
+### How to use
 
 ### How to contribute
 
@@ -24,8 +22,6 @@ This is really a pet project to learn Rust, so I'm not expecting anyone to be se
 
 ### TODO
 
-- [ ] Backend Server: Contains the core logic of our messaging app. Knows what a user, workspace, channel are and how they interact. Knows about the message server and the DB and how to talk to them
-- [ ] Storage Layer: Persist everything that happens within the messaging app
+- [ ] Web Framework: That can be used by clients to communicate with the backend server
 - [ ] Message Server: Listens to updates from the backend server. Fans out real-time events to all clients (within a workspace)
-- [ ] Desktop Client: The app our users will use 
 - [ ] Load testing
