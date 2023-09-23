@@ -1,4 +1,4 @@
--include .env  # if .env fine exists, include it
+-include .env  # if .env file exists, include it
 
 install_diesel_cli:
 	sudo apt-get install libsqlite3-dev libmysqlclient-dev libpq-dev -y && \
@@ -6,14 +6,14 @@ install_diesel_cli:
 
 start_db: 
 	docker pull postgres && \
-	docker run --name rusty_db -e POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) -d -p 5432:5432 postgres
+	docker run --name $(POSTGRES_CONTAINER_NAME) -e POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) -d -p 5432:5432 postgres
 
 attach_db:
-	psql -h localhost -U postgres -d $(DATABASE_NAME)
+	psql -h localhost -U $(POSTGRES_USER) -d $(DATABASE_NAME)
 
 stop_db:
-	docker container stop rusty_db && \
-	docker container rm rusty_db
+	docker container stop $(POSTGRES_CONTAINER_NAME) && \
+	docker container rm $(POSTGRES_CONTAINER_NAME)
 	
 prepare_db:
 	diesel setup && \
