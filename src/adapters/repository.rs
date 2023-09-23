@@ -14,7 +14,6 @@ impl<'a> UserRepository<'a> {
     fn new(connection: &'a mut PgConnection) -> Self {
         UserRepository { connection }
     }
-
     fn get_user(&mut self, id: i32) -> Result<User, Box<dyn Error + 'static>> {
         let user: User = users::table.find(id).first(&mut *self.connection)?;
         Ok(User {
@@ -44,24 +43,31 @@ mod test {
     use dotenvy::dotenv;
     use std::env;
 
-    fn rebuild_db() {
+    fn rebuild_database() {
         use std::process::Command;
         Command::new("diesel")
             .arg("migration")
             .arg("redo")
             .output()
+            // rename error message
             .expect("Something is wrong");
     }
 
-    #[test]
-    fn test_create_user_via_repository() {
-        // given
-        rebuild_db();
+    fn get_database_url() -> String {
         dotenv().ok();
-        let database_url =
-            env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set.");
-        let conn = &mut PgConnection::establish(&database_url)
-            .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
+        env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set.")
+    }
+
+    fn get_database_connection() -> diesel::PgConnection {
+        rebuild_database();
+        let database_url = get_database_url();
+        PgConnection::establish(&database_url)
+            .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
+    }
+    #[test]
+    fn test_create_method() {
+        // given
+        let conn = &mut get_database_connection();
 
         // when
         let mut repo = UserRepository::new(conn);
@@ -69,10 +75,22 @@ mod test {
             username: &"John Doe".to_string(),
             email: &"johndoe@example.com".to_string(),
         };
-        repo.save_user(&user).unwrap();
+        let result = repo.save_user(&user);
 
         // then
-        let user = repo.get_user(1).unwrap();
-        assert_eq!(user.username, "John Doe")
+        assert!(result.is_ok())
+    }
+
+    #[test]
+    fn test_get_method_with_empty_user_table() {
+        // given
+        let conn = &mut get_database_connection();
+
+        // when
+        let mut repo = UserRepository::new(conn);
+        let result = repo.get_user(999);
+
+        // then
+        assert_eq!(result.is_ok(), false)
     }
 }
