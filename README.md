@@ -20,6 +20,31 @@ This is really a pet project to learn Rust, so I'm not expecting anyone to be se
 * `ops`: Commits that affect operational components like infrastructure, deployment, backup, recovery, ...
 * `chore`: Miscellaneous commits e.g. modifying `.gitignore`
 
+Before we start, we will need to install `diesel_cli` to help managing the project. If you're using Ubuntu, you can do that by running the following command:
+
+```bash
+$ make install_diesel_cli
+```
+
+After that, we can start a Docker container running a Postgres server and apply the migrations to get the database to the desired state.
+
+```bash
+$ make start_db
+$ make prepare_db
+```
+
+We should now be able to run unit and integration tests.
+
+```bash
+$ make test
+```
+
+When we are done developing, we can stop the Docker container running Postgres.
+
+```bash
+$ make stop_db
+```
+
 ### Tools
 
 - Docker
