@@ -25,6 +25,7 @@ This is really a pet project to learn Rust, so I'm not expecting anyone to be se
 - Docker
 - [Cargo](https://github.com/rust-lang/cargo)
 - [Diesel](https://github.com/diesel-rs/diesel)
+- [PostgreSQL](https://github.com/postgres/postgres)
 - [Actix Web](https://github.com/actix/actix-web)
 
 ### TODO
