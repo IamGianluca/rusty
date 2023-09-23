@@ -83,7 +83,7 @@ mod test {
 
         // when
         let mut repo = UserRepository::new(conn);
-        let result = repo.get_user(999);
+        let result = repo.get_user(1);
 
         // then
         assert_eq!(result.is_ok(), false)
