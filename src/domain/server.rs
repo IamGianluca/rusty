@@ -1,15 +1,16 @@
 use crate::domain::channel::Channel;
-use crate::domain::user::User;
-use chrono::Utc;
 use std::collections::HashMap;
 
-pub struct ChatServer {
+use super::user::NewUser;
+
+pub struct ChatServer<'a> {
     workspace: String,
     channels: HashMap<String, Channel>,
-    users: HashMap<String, User>,
+    users: HashMap<String, NewUser<'a>>,
 }
-impl ChatServer {
-    pub fn new(workspace: String) -> ChatServer {
+
+impl<'a> ChatServer<'a> {
+    pub fn new(workspace: String) -> ChatServer<'a> {
         println!("Creating new chat.");
         let mut chat = ChatServer {
             workspace,
@@ -25,14 +26,7 @@ impl ChatServer {
         self.channels.insert(channel.name.to_string(), channel);
     }
 
-    pub fn create_user(&mut self, name: String) {
-        let user = User {
-            id: 1,
-            username: name,
-            email: "test@test.com".to_string(),
-            created_at: Utc::now(),
-        };
-        println!("Creating new user.");
+    pub fn create_user(&mut self, user: NewUser<'a>) {
         self.users.insert(user.username.to_string(), user);
     }
 
@@ -42,10 +36,20 @@ impl ChatServer {
     }
 }
 
+pub fn register_new_user_to_chat_server<'a>(server: &mut ChatServer<'a>, user: NewUser<'a>) {
+    server.create_user(user)
+}
+
 #[cfg(test)]
 mod test {
-    use crate::domain::server::ChatServer;
+    use crate::domain::{server::ChatServer, user::NewUser};
 
+    fn create_user_from_name(name: &str) -> NewUser {
+        NewUser {
+            username: name,
+            email: "{name}@example.com",
+        }
+    }
     #[test]
     fn test_create_chat() {
         let chat = ChatServer::new(String::from("company1"));
@@ -55,7 +59,7 @@ mod test {
     #[test]
     fn test_create_user() {
         let mut chat = ChatServer::new(String::from("company1"));
-        chat.create_user("user1".to_string());
+        chat.create_user(create_user_from_name("user1"));
         assert_eq!(chat.users.len(), 1);
         assert!(chat.users.contains_key("user1"));
     }
@@ -63,9 +67,9 @@ mod test {
     #[test]
     fn test_create_multiple_users() {
         let mut chat = ChatServer::new(String::from("company1"));
-        chat.create_user("user1".to_string());
-        chat.create_user("user2".to_string());
-        chat.create_user("user3".to_string());
+        chat.create_user(create_user_from_name("user1"));
+        chat.create_user(create_user_from_name("user2"));
+        chat.create_user(create_user_from_name("user3"));
         assert_eq!(chat.users.len(), 3);
         for user_name in ["user1", "user2", "user3"] {
             assert!(chat.users.contains_key(user_name))

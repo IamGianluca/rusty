@@ -1,6 +1,6 @@
 use std::io;
 
-use crate::domain::server::ChatServer;
+use crate::domain::{server::ChatServer, user::NewUser};
 
 pub mod adapters;
 pub mod client;
@@ -22,6 +22,10 @@ fn main() {
     io::stdin()
         .read_line(&mut username)
         .expect("Failed to read line.");
-    let username = username.trim().to_string();
-    chat.create_user(username);
+    let username = username.trim();
+    let user = NewUser {
+        username: username,
+        email: "{username}@example.com",
+    };
+    chat.create_user(user);
 }
