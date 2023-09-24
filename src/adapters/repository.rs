@@ -5,7 +5,7 @@ use std::error::Error;
 
 use super::schema::users;
 
-struct UserRepository<'a> {
+pub struct UserRepository<'a> {
     connection: &'a mut PgConnection,
 }
 
@@ -14,12 +14,12 @@ impl<'a> UserRepository<'a> {
         UserRepository { connection }
     }
 
-    fn get_user(&mut self, id: i32) -> Result<User, Box<dyn Error + 'static>> {
+    pub fn get_user(&mut self, id: i32) -> Result<User, Box<dyn Error + 'static>> {
         let user: User = users::table.find(id).first(&mut *self.connection)?;
         Ok(user)
     }
 
-    fn save_user(&mut self, user: &NewUser) -> Result<User, Box<dyn Error + 'static>> {
+    pub fn save_user(&mut self, user: &NewUser) -> Result<User, Box<dyn Error + 'static>> {
         use crate::adapters::schema::users::dsl::*;
 
         let inserted_user = diesel::insert_into(users)
