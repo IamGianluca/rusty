@@ -17,13 +17,25 @@ impl<'a> ChatServer<'a> {
             channels: HashMap::new(),
             users: HashMap::new(),
         };
-        chat.create_channel("general".to_string());
-        chat
+        match chat.create_channel("general".to_string()) {
+            Ok(_) => chat,
+            Err(err) => {
+                println!("{}", err);
+                chat
+            }
+        }
     }
 
-    pub fn create_channel(&mut self, name: String) {
-        let channel = Channel::new(name);
-        self.channels.insert(channel.name.to_string(), channel);
+    // todo: we should pass a NewChannel to this method, not a string
+    // the service layer will create the NewChannel obj for us
+    pub fn create_channel(&mut self, name: String) -> Result<&str, &str> {
+        if self.channels.contains_key(&name) {
+            Err("Channel {channel} already exists.")
+        } else {
+            let channel = Channel::new(name);
+            self.channels.insert(channel.name.to_string(), channel);
+            Ok("Created channel {channel}")
+        }
     }
 
     pub fn create_user(&mut self, user: NewUser<'a>) {
@@ -44,7 +56,7 @@ pub fn register_new_user_to_chat_server<'a>(server: &mut ChatServer<'a>, user: N
 mod test {
     use crate::domain::{server::ChatServer, user::NewUser};
 
-    fn create_user_from_name(name: &str) -> NewUser {
+    fn create_user_from_username(name: &str) -> NewUser {
         NewUser {
             username: name,
             email: "{name}@example.com",
@@ -59,7 +71,7 @@ mod test {
     #[test]
     fn test_create_user() {
         let mut chat = ChatServer::new(String::from("company1"));
-        chat.create_user(create_user_from_name("user1"));
+        chat.create_user(create_user_from_username("user1"));
         assert_eq!(chat.users.len(), 1);
         assert!(chat.users.contains_key("user1"));
     }
@@ -67,9 +79,9 @@ mod test {
     #[test]
     fn test_create_multiple_users() {
         let mut chat = ChatServer::new(String::from("company1"));
-        chat.create_user(create_user_from_name("user1"));
-        chat.create_user(create_user_from_name("user2"));
-        chat.create_user(create_user_from_name("user3"));
+        chat.create_user(create_user_from_username("user1"));
+        chat.create_user(create_user_from_username("user2"));
+        chat.create_user(create_user_from_username("user3"));
         assert_eq!(chat.users.len(), 3);
         for user_name in ["user1", "user2", "user3"] {
             assert!(chat.users.contains_key(user_name))
@@ -86,7 +98,7 @@ mod test {
     #[test]
     fn test_create_channel() {
         let mut chat = ChatServer::new(String::from("company1"));
-        chat.create_channel("channel1".to_string());
+        let _ = chat.create_channel("channel1".to_string());
         assert_eq!(chat.channels.len(), 2);
         for channel_name in ["general", "channel1"] {
             assert!(chat.channels.contains_key(channel_name))
@@ -125,5 +137,13 @@ mod test {
         let msg = &chat.channels.get("general").unwrap().messages[1];
         assert_eq!(&msg.text, "life is great");
         assert_eq!(&msg.sender, "user2");
+    }
+
+    #[test]
+    fn test_create_channel_with_existing_name() {
+        let mut chat = ChatServer::new("company1".to_string());
+        let _ = chat.create_channel("new".to_string());
+        let result = chat.create_channel("new".to_string());
+        assert!(result.is_err())
     }
 }
