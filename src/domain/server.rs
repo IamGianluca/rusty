@@ -26,31 +26,31 @@ impl<'a> ChatServer<'a> {
         }
     }
 
-    // todo: we should pass a NewChannel to this method, not a string
-    // the service layer will create the NewChannel obj for us
-    pub fn create_channel(&mut self, name: String) -> Result<&str, &str> {
-        if self.channels.contains_key(&name) {
-            Err("Channel {channel} already exists.")
-        } else {
-            let channel = Channel::new(name);
-            self.channels.insert(channel.name.to_string(), channel);
-            Ok("Created channel {channel}")
-        }
-    }
+    // // todo: we should pass a NewChannel to this method, not a string
+    // // the service layer will create the NewChannel obj for us
+    // pub fn create_channel(&mut self, name: String) -> Result<&str, &str> {
+    //     if self.channels.contains_key(&name) {
+    //         Err("Channel {channel} already exists.")
+    //     } else {
+    //         let channel = Channel::new(name);
+    //         self.channels.insert(channel.name.to_string(), channel);
+    //         Ok("Created channel {channel}")
+    //     }
+    // }
+    //
+    // pub fn create_user(&mut self, user: NewUser<'a>) {
+    //     self.users.insert(user.username.to_string(), user);
+    // }
 
-    pub fn create_user(&mut self, user: NewUser<'a>) {
-        self.users.insert(user.username.to_string(), user);
-    }
-
-    pub fn send_message(&mut self, user: String, channel: String, message: String) {
-        let ch = self.channels.get_mut(&channel).unwrap();
-        ch.add_message(user, message);
-    }
+    // pub fn send_message(&mut self, user: String, channel: String, message: String) {
+    //     let ch = self.channels.get_mut(&channel).unwrap();
+    //     ch.add_message(user, message);
+    // }
 }
 
-pub fn register_new_user_to_chat_server<'a>(server: &mut ChatServer<'a>, user: NewUser<'a>) {
-    server.create_user(user)
-}
+// pub fn register_new_user_to_chat_server<'a>(server: &mut ChatServer<'a>, user: NewUser<'a>) {
+//     server.create_user(user)
+// }
 
 #[cfg(test)]
 mod test {

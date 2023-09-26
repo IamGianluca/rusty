@@ -58,6 +58,33 @@ impl<'a> ChannelRepository<'a> {
     }
 }
 
+pub struct MessageRepository<'a> {
+    connection: &'a mut PgConnection,
+}
+
+impl<'a> MessageRepository<'a> {
+    fn new(connection: &'a mut PgConnection) -> Self {
+        MessageRepository { connection }
+    }
+
+    pub fn get_message(&mut self, id: i32) -> Result<Message, Box<dyn Error + 'static>> {
+        let message: Message = messages::table.find(id).first(&mut *self.connection)?;
+        Ok(message)
+    }
+
+    pub fn save_message(
+        &mut self,
+        message: &NewMessage,
+    ) -> Result<Message, Box<dyn Error + 'static>> {
+        use crate::adapters::schema::messages::dsl::*;
+
+        let inserted_message = diesel::insert_into(messages)
+            .values(message)
+            .get_result::<Message>(&mut *self.connection)?;
+        Ok(inserted_message)
+    }
+}
+
 #[cfg(test)]
 mod test {
     use crate::adapters::repository::UserRepository;
