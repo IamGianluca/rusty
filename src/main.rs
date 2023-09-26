@@ -8,8 +8,6 @@ pub mod domain;
 pub mod service_layer;
 
 fn main() {
-    println!("I'm a little rusty with Rust!");
-
     println!("Please input workspace name.");
     let mut workspace = String::new();
     io::stdin()
@@ -25,7 +23,7 @@ fn main() {
         .expect("Failed to read line.");
     let username = username.trim();
     let user = NewUser {
-        username: username,
+        username,
         email: "{username}@example.com",
     };
     chat.create_user(user);

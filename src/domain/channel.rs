@@ -1,28 +1,40 @@
+use crate::adapters::schema::channels;
+use crate::adapters::schema::messages;
+use chrono::Utc;
+use diesel::prelude::*;
+
+#[derive(Debug, Queryable, Selectable)]
+#[diesel(table_name = channels)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Channel {
+    pub id: i32,
     pub name: String,
-    pub messages: Vec<Message>,
+    pub description: String,
+    pub created_at: chrono::DateTime<Utc>,
 }
 
-impl Channel {
-    pub fn new(name: String) -> Channel {
-        Channel {
-            name,
-            messages: Vec::new(),
-        }
-    }
-    pub fn add_message(&mut self, sender: String, text: String) {
-        let msg = Message::new(sender, text);
-        self.messages.push(msg);
-    }
+#[derive(Insertable)]
+#[diesel(table_name = channels)]
+pub struct NewChannel<'a> {
+    pub name: &'a str,
+    pub description: &'a str,
 }
 
+#[derive(Debug, Queryable, Selectable)]
+#[diesel(table_name = messages)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Message {
-    pub sender: String,
-    pub text: String,
+    pub id: i32,
+    // perhaps we should set this to NOT NULL in the sql query
+    // https://github.com/diesel-rs/diesel/issues/330#issuecomment-219279105
+    pub channel_id: Option<i32>,
+    pub user_id: Option<i32>,
+    pub content: String,
+    pub created_at: chrono::DateTime<Utc>,
 }
 
-impl Message {
-    pub fn new(sender: String, text: String) -> Message {
-        Message { sender, text }
-    }
+#[derive(Insertable)]
+#[diesel(table_name = messages)]
+pub struct NewMessage<'a> {
+    pub content: &'a str,
 }

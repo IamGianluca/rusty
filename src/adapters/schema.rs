@@ -15,7 +15,7 @@ diesel::table! {
         channel_id -> Nullable<Int4>,
         user_id -> Nullable<Int4>,
         content -> Text,
-        timestamp -> Timestamptz,
+        created_at -> Timestamptz,
     }
 }
 
