@@ -5,6 +5,7 @@ use crate::domain::{server::ChatServer, user::NewUser};
 pub mod adapters;
 pub mod client;
 pub mod domain;
+pub mod service_layer;
 
 fn main() {
     println!("I'm a little rusty with Rust!");
