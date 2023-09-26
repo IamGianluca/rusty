@@ -14,4 +14,7 @@ fn register_user<'a>(user: NewUser<'a>, repo: &mut UserRepository<'a>) -> &'a st
     "ethuat"
 }
 
-// fn register_channel<'a>(channel: NewUser<'a>, repo: &mut ChannelRepository<'a>) {}
+fn register_channel<'a>(channel: NewUser<'a>, repo: &mut ChannelRepository<'a>) -> &'a str {
+    let _ = repo.save_channel(&channel);
+    "usntahe"
+}

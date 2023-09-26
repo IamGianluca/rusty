@@ -1,8 +1,10 @@
+use crate::domain::channel::{Channel, NewChannel};
 use crate::domain::user::{NewUser, User};
 use diesel::prelude::*;
 use diesel::{self, PgConnection};
 use std::error::Error;
 
+use super::schema::channels;
 use super::schema::users;
 
 pub struct UserRepository<'a> {
@@ -26,6 +28,33 @@ impl<'a> UserRepository<'a> {
             .values(user)
             .get_result::<User>(&mut *self.connection)?;
         Ok(inserted_user)
+    }
+}
+
+pub struct ChannelRepository<'a> {
+    connection: &'a mut PgConnection,
+}
+
+impl<'a> ChannelRepository<'a> {
+    fn new(connection: &'a mut PgConnection) -> Self {
+        ChannelRepository { connection }
+    }
+
+    pub fn get_channel(&mut self, id: i32) -> Result<Channel, Box<dyn Error + 'static>> {
+        let channel: Channel = channels::table.find(id).first(&mut *self.connection)?;
+        Ok(channel)
+    }
+
+    pub fn save_channel(
+        &mut self,
+        channel: &NewChannel,
+    ) -> Result<Channel, Box<dyn Error + 'static>> {
+        use crate::adapters::schema::channels::dsl::*;
+
+        let inserted_channel = diesel::insert_into(channels)
+            .values(channel)
+            .get_result::<Channel>(&mut *self.connection)?;
+        Ok(inserted_channel)
     }
 }
 
