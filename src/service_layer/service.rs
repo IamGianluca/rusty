@@ -1,3 +1,4 @@
+use crate::{adapters::repository::ChannelRepository, domain::channel::NewChannel};
 use crate::{adapters::repository::UserRepository, domain::user::NewUser};
 
 // what i originally created as the ChatServer, should become the
@@ -14,7 +15,7 @@ fn register_user<'a>(user: NewUser<'a>, repo: &mut UserRepository<'a>) -> &'a st
     "ethuat"
 }
 
-fn register_channel<'a>(channel: NewUser<'a>, repo: &mut ChannelRepository<'a>) -> &'a str {
+fn register_channel<'a>(channel: NewChannel<'a>, repo: &mut ChannelRepository<'a>) -> &'a str {
     let _ = repo.save_channel(&channel);
     "usntahe"
 }
