@@ -25,6 +25,13 @@ fn send_message_to_channel<'a>(
     message: NewMessage<'a>,
     repo: &mut MessageRepository<'a>,
 ) -> &'a str {
+    // infra
+    let channels = repo.get_channel();
+
+    // logic
+    chennel.
+
+    // infra
     let _ = repo.save_message(&message);
     "nuthanet"
 }

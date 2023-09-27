@@ -2,51 +2,56 @@ use crate::domain::channel::Channel;
 use std::collections::HashMap;
 
 use super::user::NewUser;
+// what are the competenses of the server class?
+// perhaps it is to check if someone is authorized to access a channel? or
+// what else????? do we even need this class?
+//
+//
+//
+// pub struct ChatServer<'a> {
+//     workspace: String,
+//     channels: HashMap<String, Channel>,
+//     users: HashMap<String, NewUser<'a>>,
+// }
+//
+// impl<'a> ChatServer<'a> {
+//     pub fn new(workspace: String) -> ChatServer<'a> {
+//         println!("Creating new chat.");
+//         let mut chat = ChatServer {
+//             workspace,
+//             channels: HashMap::new(),
+//             users: HashMap::new(),
+//         };
+//         match chat.create_channel("general".to_string()) {
+//             Ok(_) => chat,
+//             Err(err) => {
+//                 println!("{}", err);
+//                 chat
+//             }
+//         }
+//     }
 
-pub struct ChatServer<'a> {
-    workspace: String,
-    channels: HashMap<String, Channel>,
-    users: HashMap<String, NewUser<'a>>,
-}
+// // todo: we should pass a NewChannel to this method, not a string
+// // the service layer will create the NewChannel obj for us
+// pub fn create_channel(&mut self, name: String) -> Result<&str, &str> {
+//     if self.channels.contains_key(&name) {
+//         Err("Channel {channel} already exists.")
+//     } else {
+//         let channel = Channel::new(name);
+//         self.channels.insert(channel.name.to_string(), channel);
+//         Ok("Created channel {channel}")
+//     }
+// }
+//
+// pub fn create_user(&mut self, user: NewUser<'a>) {
+//     self.users.insert(user.username.to_string(), user);
+// }
 
-impl<'a> ChatServer<'a> {
-    pub fn new(workspace: String) -> ChatServer<'a> {
-        println!("Creating new chat.");
-        let mut chat = ChatServer {
-            workspace,
-            channels: HashMap::new(),
-            users: HashMap::new(),
-        };
-        match chat.create_channel("general".to_string()) {
-            Ok(_) => chat,
-            Err(err) => {
-                println!("{}", err);
-                chat
-            }
-        }
-    }
-
-    // // todo: we should pass a NewChannel to this method, not a string
-    // // the service layer will create the NewChannel obj for us
-    // pub fn create_channel(&mut self, name: String) -> Result<&str, &str> {
-    //     if self.channels.contains_key(&name) {
-    //         Err("Channel {channel} already exists.")
-    //     } else {
-    //         let channel = Channel::new(name);
-    //         self.channels.insert(channel.name.to_string(), channel);
-    //         Ok("Created channel {channel}")
-    //     }
-    // }
-    //
-    // pub fn create_user(&mut self, user: NewUser<'a>) {
-    //     self.users.insert(user.username.to_string(), user);
-    // }
-
-    // pub fn send_message(&mut self, user: String, channel: String, message: String) {
-    //     let ch = self.channels.get_mut(&channel).unwrap();
-    //     ch.add_message(user, message);
-    // }
-}
+// pub fn send_message(&mut self, user: String, channel: String, message: String) {
+//     let ch = self.channels.get_mut(&channel).unwrap();
+//     ch.add_message(user, message);
+// }
+// }
 
 // pub fn register_new_user_to_chat_server<'a>(server: &mut ChatServer<'a>, user: NewUser<'a>) {
 //     server.create_user(user)

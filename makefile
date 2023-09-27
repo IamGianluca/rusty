@@ -5,7 +5,7 @@ install_diesel_cli:
 	cargo install diesel_cli
 
 start_db: 
-	docker pull postgres && \
+	docker pull postgres:16 && \
 	docker run --name $(POSTGRES_CONTAINER_NAME) -e POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) -d -p 5432:5432 postgres
 
 attach_db:
