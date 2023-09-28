@@ -47,7 +47,7 @@ mod test {
             email: &"johndoe@example.com".to_string(),
         };
 
-        // then: no user in the db
+        // then: no user in the db, empty vector
         let result = repo.find_all();
         assert_eq!(result.unwrap().len(), 0);
 
@@ -57,9 +57,9 @@ mod test {
         // then
         let result = repo.find_all();
         assert!(result.is_ok());
-        let retrieved_users = result.unwrap();
-        assert_eq!(retrieved_users.len(), 1);
-        let first = &retrieved_users[0];
+        let result = result.unwrap();
+        assert_eq!(result.len(), 1);
+        let first = &result[0];
         assert_eq!(first.username, "John Doe");
         assert_eq!(first.email, "johndoe@example.com")
     }

@@ -20,10 +20,10 @@ impl<'a> UserRepository<'a> {
     }
 
     pub fn find_all(&mut self) -> Result<Vec<User>, Box<dyn Error + 'static>> {
-        let user: Vec<User> = users::table
+        let result: Vec<User> = users::table
             .select(User::as_select())
             .load(&mut *self.connection)?;
-        Ok(user)
+        Ok(result)
     }
 
     pub fn save(&mut self, user: &NewUser) -> Result<User, Box<dyn Error + 'static>> {
