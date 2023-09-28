@@ -10,7 +10,7 @@ pub struct UserRepository<'a> {
 }
 
 impl<'a> UserRepository<'a> {
-    fn new(connection: &'a mut PgConnection) -> Self {
+    pub fn new(connection: &'a mut PgConnection) -> Self {
         UserRepository { connection }
     }
 
