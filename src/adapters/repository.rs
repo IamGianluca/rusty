@@ -5,13 +5,13 @@ use std::error::Error;
 
 use super::schema::users;
 
-pub struct UserRepository<'a> {
+pub struct DbUserRepository<'a> {
     connection: &'a mut PgConnection,
 }
 
-impl<'a> UserRepository<'a> {
+impl<'a> DbUserRepository<'a> {
     pub fn new(connection: &'a mut PgConnection) -> Self {
-        UserRepository { connection }
+        DbUserRepository { connection }
     }
 
     pub fn find(&mut self, id: i32) -> Result<User, Box<dyn Error + 'static>> {
@@ -40,7 +40,7 @@ impl<'a> UserRepository<'a> {
 
 #[cfg(test)]
 mod test {
-    use crate::adapters::repository::UserRepository;
+    use crate::adapters::repository::DbUserRepository;
     use crate::domain::user::NewUser;
     use diesel::prelude::*;
     use dotenvy::dotenv;
@@ -74,7 +74,7 @@ mod test {
         let conn = &mut get_database_connection();
 
         // when
-        let mut repo = UserRepository::new(conn);
+        let mut repo = DbUserRepository::new(conn);
         let user = NewUser {
             username: &"John Doe".to_string(),
             email: &"johndoe@example.com".to_string(),
@@ -91,7 +91,7 @@ mod test {
         let conn = &mut get_database_connection();
 
         // when
-        let mut repo = UserRepository::new(conn);
+        let mut repo = DbUserRepository::new(conn);
         let result = repo.find(1);
 
         // then
@@ -103,7 +103,7 @@ mod test {
         // given
         let conn = &mut get_database_connection();
 
-        let mut repo = UserRepository::new(conn);
+        let mut repo = DbUserRepository::new(conn);
         let user = NewUser {
             username: &"John Doe".to_string(),
             email: &"johndoe@example.com".to_string(),

@@ -1,13 +1,24 @@
-use crate::{adapters::repository::UserRepository, domain::user::NewUser};
+use crate::{
+    adapters::{message_repository::MessageRepository, repository::DbUserRepository},
+    domain::{message::NewMessage, user::NewUser},
+};
 
-fn create_user<'a>(user: NewUser<'a>, repo: &mut UserRepository<'a>) {
+fn create_user<'a>(user: NewUser<'a>, repo: &mut DbUserRepository<'a>) {
     let _ = repo.save(&user);
+}
+
+fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
+    repo.save_message(message)
 }
 
 #[cfg(test)]
 mod test {
-    use crate::adapters::repository::UserRepository;
+    use crate::adapters::message_repository::{DbMessageRepository, MessageRepository};
+    use crate::adapters::repository::DbUserRepository;
+    use crate::domain::channel::NewChannel;
+    use crate::domain::message::NewMessage;
     use crate::domain::user::NewUser;
+    use crate::service_layer::service::send_message;
     use diesel::prelude::*;
     use dotenvy::dotenv;
     use std::env;
@@ -40,7 +51,7 @@ mod test {
     fn test_service_create_user() {
         // given
         let conn = &mut get_database_connection();
-        let mut repo = UserRepository::new(conn);
+        let mut repo = DbUserRepository::new(conn);
 
         let user = NewUser {
             username: &"John Doe".to_string(),
@@ -62,5 +73,36 @@ mod test {
         let first = &result[0];
         assert_eq!(first.username, "John Doe");
         assert_eq!(first.email, "johndoe@example.com")
+    }
+
+    #[test]
+    fn test_send_message() {
+        // given
+        let conn = &mut get_database_connection();
+        let mut repo = DbMessageRepository { connection: conn };
+
+        let user = NewUser {
+            username: &"John Doe".to_string(),
+            email: &"johndoe@example.com".to_string(),
+        };
+        repo.save_user(user);
+        let channel = NewChannel {
+            name: &"fake channel",
+            description: &"a channel",
+        };
+        repo.save_channel(channel);
+
+        // when
+        let message = NewMessage {
+            channel_id: &1,
+            user_id: &1,
+            content: &"something",
+        };
+        send_message(message, &mut repo);
+
+        // then
+        let result = repo.get_message_by_id(1);
+        assert!(result.is_some());
+        assert_eq!(result.unwrap().content, "something")
     }
 }

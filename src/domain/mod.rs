@@ -1,3 +1,3 @@
 pub mod channel;
-pub mod server;
+pub mod message;
 pub mod user;
