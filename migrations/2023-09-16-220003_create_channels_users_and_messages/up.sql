@@ -15,8 +15,8 @@ CREATE TABLE users (
 
 CREATE TABLE messages (
   id SERIAL PRIMARY KEY,
-  channel_id INT REFERENCES channels(id),
-  user_id INT REFERENCES users(id),
+  channel_id INT NOT NULL REFERENCES channels(id),
+  user_id INT NOT NULL REFERENCES users(id),
   content TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 )

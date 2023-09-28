@@ -1,28 +1,21 @@
+use crate::adapters::schema::channels;
+use chrono::Utc;
+use diesel::prelude::*;
+
+#[derive(Debug, Queryable, Selectable)]
+#[diesel(table_name = channels)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Channel {
+    pub id: i32,
+    // should create a workspace concept and have workspace_id in here
     pub name: String,
-    pub messages: Vec<Message>,
+    pub description: String,
+    pub created_at: chrono::DateTime<Utc>,
 }
 
-impl Channel {
-    pub fn new(name: String) -> Channel {
-        Channel {
-            name,
-            messages: Vec::new(),
-        }
-    }
-    pub fn add_message(&mut self, sender: String, text: String) {
-        let msg = Message::new(sender, text);
-        self.messages.push(msg);
-    }
-}
-
-pub struct Message {
-    pub sender: String,
-    pub text: String,
-}
-
-impl Message {
-    pub fn new(sender: String, text: String) -> Message {
-        Message { sender, text }
-    }
+#[derive(Insertable)]
+#[diesel(table_name = channels)]
+pub struct NewChannel<'a> {
+    pub name: &'a str,
+    pub description: &'a str,
 }
