@@ -19,6 +19,13 @@ impl<'a> UserRepository<'a> {
         Ok(user)
     }
 
+    pub fn find_all(&mut self) -> Result<Vec<User>, Box<dyn Error + 'static>> {
+        let user: Vec<User> = users::table
+            .select(User::as_select())
+            .load(&mut *self.connection)?;
+        Ok(user)
+    }
+
     pub fn save(&mut self, user: &NewUser) -> Result<User, Box<dyn Error + 'static>> {
         use crate::adapters::schema::users::dsl::*;
 

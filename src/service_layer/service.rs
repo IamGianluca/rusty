@@ -48,17 +48,19 @@ mod test {
         };
 
         // then: no user in the db
-        let result = repo.find(1);
-        assert!(result.is_err());
+        let result = repo.find_all();
+        assert_eq!(result.unwrap().len(), 0);
 
         // when
         create_user(user, &mut repo);
 
         // then
-        let result = repo.find(1);
+        let result = repo.find_all();
         assert!(result.is_ok());
-        let retrieved_user = result.unwrap();
-        assert_eq!(retrieved_user.username, "John Doe");
-        assert_eq!(retrieved_user.email, "johndoe@example.com")
+        let retrieved_users = result.unwrap();
+        assert_eq!(retrieved_users.len(), 1);
+        let first = &retrieved_users[0];
+        assert_eq!(first.username, "John Doe");
+        assert_eq!(first.email, "johndoe@example.com")
     }
 }
