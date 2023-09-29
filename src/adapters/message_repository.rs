@@ -1,5 +1,3 @@
-use std::error::Error;
-
 use diesel::prelude::*;
 
 use crate::domain::channel::NewChannel;
@@ -13,11 +11,11 @@ use super::schema::users;
 
 pub trait MessageRepository {
     fn save_user(&mut self, user: NewUser);
-    fn get_user_by_id(&mut self, id: i32) -> Result<User, Box<dyn Error + 'static>>;
+    fn get_user_by_id(&mut self, id: i32) -> Option<User>;
     fn save_channel(&mut self, channel: NewChannel);
-    fn get_channel_by_id(&mut self, id: i32) -> Result<Channel, Box<dyn Error + 'static>>;
-    fn get_message_by_id(&mut self, id: i32) -> Option<Message>;
+    fn get_channel_by_id(&mut self, id: i32) -> Option<Channel>;
     fn save_message(&mut self, message: NewMessage);
+    fn get_message_by_id(&mut self, id: i32) -> Option<Message>;
     // Add more methods as needed
 }
 
@@ -32,9 +30,9 @@ impl MessageRepository for DbMessageRepository<'_> {
             .values(&user)
             .execute(&mut *self.connection);
     }
-    fn get_user_by_id(&mut self, id: i32) -> Result<User, Box<dyn Error + 'static>> {
-        let user: User = users::table.find(id).first(&mut *self.connection)?;
-        Ok(user)
+    fn get_user_by_id(&mut self, id: i32) -> Option<User> {
+        let user: User = users::table.find(id).first(&mut *self.connection).ok()?;
+        Some(user)
     }
 
     // channel
@@ -44,9 +42,9 @@ impl MessageRepository for DbMessageRepository<'_> {
             .execute(&mut *self.connection);
     }
 
-    fn get_channel_by_id(&mut self, id: i32) -> Result<Channel, Box<dyn Error + 'static>> {
-        let channel: Channel = channels::table.find(id).first(&mut *self.connection)?;
-        Ok(channel)
+    fn get_channel_by_id(&mut self, id: i32) -> Option<Channel> {
+        let channel: Channel = channels::table.find(id).first(&mut *self.connection).ok()?;
+        Some(channel)
     }
 
     // message
