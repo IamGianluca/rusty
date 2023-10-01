@@ -36,8 +36,6 @@ impl UserRepository for DbUserRepository<'_> {
             .get_result::<User>(&mut *self.connection);
         inserted_user.unwrap().id
     }
-
-    // todo: add `find_all`, `update`, and `delete`
 }
 
 #[cfg(test)]
@@ -54,7 +52,6 @@ mod test {
             .arg("migration")
             .arg("redo")
             .output()
-            // rename error message
             .expect("Something is wrong");
     }
 

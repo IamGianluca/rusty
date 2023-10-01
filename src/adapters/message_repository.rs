@@ -16,7 +16,6 @@ pub trait MessageRepository {
     fn get_channel_by_id(&mut self, id: i32) -> Option<Channel>;
     fn save_message(&mut self, message: NewMessage);
     fn get_message_by_id(&mut self, id: i32) -> Option<Message>;
-    // Add more methods as needed
 }
 
 pub struct DbMessageRepository<'a> {
