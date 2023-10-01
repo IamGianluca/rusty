@@ -1,12 +1,9 @@
 use crate::{
-    adapters::{
-        message_repository::MessageRepository,
-        user_repository::{DbUserRepository, UserRepository},
-    },
+    adapters::{message_repository::MessageRepository, user_repository::UserRepository},
     domain::{message::NewMessage, user::NewUser},
 };
 
-fn create_user<'a>(user: NewUser<'a>, repo: &mut DbUserRepository<'a>) {
+fn create_user(user: NewUser, repo: &mut dyn UserRepository) {
     let _ = repo.save_user(&user);
 }
 
