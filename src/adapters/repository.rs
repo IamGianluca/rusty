@@ -1,38 +1,40 @@
 use crate::domain::user::{NewUser, User};
 use diesel::prelude::*;
 use diesel::{self, PgConnection};
-use std::error::Error;
 
 use super::schema::users;
 
-pub struct DbUserRepository<'a> {
-    connection: &'a mut PgConnection,
+pub trait UserRepository {
+    fn save_user(&mut self, user: &NewUser) -> i32;
+    fn get_user_by_id(&mut self, id: i32) -> Option<User>;
+    fn get_all(&mut self) -> Option<Vec<User>>;
 }
 
-impl<'a> DbUserRepository<'a> {
-    pub fn new(connection: &'a mut PgConnection) -> Self {
-        DbUserRepository { connection }
+pub struct DbUserRepository<'a> {
+    pub connection: &'a mut PgConnection,
+}
+
+impl UserRepository for DbUserRepository<'_> {
+    fn get_user_by_id(&mut self, id: i32) -> Option<User> {
+        let user: User = users::table.find(id).first(&mut *self.connection).ok()?;
+        Some(user)
     }
 
-    pub fn find(&mut self, id: i32) -> Result<User, Box<dyn Error + 'static>> {
-        let user: User = users::table.find(id).first(&mut *self.connection)?;
-        Ok(user)
-    }
-
-    pub fn find_all(&mut self) -> Result<Vec<User>, Box<dyn Error + 'static>> {
+    fn get_all(&mut self) -> Option<Vec<User>> {
         let result: Vec<User> = users::table
             .select(User::as_select())
-            .load(&mut *self.connection)?;
-        Ok(result)
+            .load(&mut *self.connection)
+            .ok()?;
+        Some(result)
     }
 
-    pub fn save(&mut self, user: &NewUser) -> Result<User, Box<dyn Error + 'static>> {
+    fn save_user(&mut self, user: &NewUser) -> i32 {
         use crate::adapters::schema::users::dsl::*;
 
         let inserted_user = diesel::insert_into(users)
             .values(user)
-            .get_result::<User>(&mut *self.connection)?;
-        Ok(inserted_user)
+            .get_result::<User>(&mut *self.connection);
+        inserted_user.unwrap().id
     }
 
     // todo: add `find_all`, `update`, and `delete`
@@ -40,7 +42,7 @@ impl<'a> DbUserRepository<'a> {
 
 #[cfg(test)]
 mod test {
-    use crate::adapters::repository::DbUserRepository;
+    use crate::adapters::repository::{DbUserRepository, UserRepository};
     use crate::domain::user::NewUser;
     use diesel::prelude::*;
     use dotenvy::dotenv;
@@ -74,15 +76,15 @@ mod test {
         let conn = &mut get_database_connection();
 
         // when
-        let mut repo = DbUserRepository::new(conn);
+        let mut repo = DbUserRepository { connection: conn };
         let user = NewUser {
             username: &"John Doe".to_string(),
             email: &"johndoe@example.com".to_string(),
         };
-        let result = repo.save(&user);
+        let result = repo.save_user(&user);
 
         // then
-        assert!(result.is_ok())
+        assert_eq!(result, 1)
     }
 
     #[test]
@@ -91,11 +93,11 @@ mod test {
         let conn = &mut get_database_connection();
 
         // when
-        let mut repo = DbUserRepository::new(conn);
-        let result = repo.find(1);
+        let mut repo = DbUserRepository { connection: conn };
+        let result = repo.get_user_by_id(1);
 
         // then
-        assert_eq!(result.is_ok(), false)
+        assert_eq!(result.is_some(), false)
     }
 
     #[test]
@@ -103,15 +105,15 @@ mod test {
         // given
         let conn = &mut get_database_connection();
 
-        let mut repo = DbUserRepository::new(conn);
-        let user = NewUser {
+        let mut repo = DbUserRepository { connection: conn };
+        let inserted_user = NewUser {
             username: &"John Doe".to_string(),
             email: &"johndoe@example.com".to_string(),
         };
-        let inserted_user = repo.save(&user).unwrap();
+        let id = repo.save_user(&inserted_user);
 
         // when
-        let retrieved_user = repo.find(inserted_user.id).unwrap();
+        let retrieved_user = repo.get_user_by_id(id).unwrap();
 
         // then
         assert_eq!(retrieved_user.username, inserted_user.username)

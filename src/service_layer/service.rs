@@ -1,10 +1,13 @@
 use crate::{
-    adapters::{message_repository::MessageRepository, repository::DbUserRepository},
+    adapters::{
+        message_repository::MessageRepository,
+        repository::{DbUserRepository, UserRepository},
+    },
     domain::{message::NewMessage, user::NewUser},
 };
 
 fn create_user<'a>(user: NewUser<'a>, repo: &mut DbUserRepository<'a>) {
-    let _ = repo.save(&user);
+    let _ = repo.save_user(&user);
 }
 
 fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
@@ -15,6 +18,7 @@ fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
 mod test {
     use crate::adapters::message_repository::{DbMessageRepository, MessageRepository};
     use crate::adapters::repository::DbUserRepository;
+    use crate::adapters::repository::UserRepository;
     use crate::domain::channel::NewChannel;
     use crate::domain::message::NewMessage;
     use crate::domain::user::NewUser;
@@ -51,7 +55,7 @@ mod test {
     fn test_service_create_user() {
         // given
         let conn = &mut get_database_connection();
-        let mut repo = DbUserRepository::new(conn);
+        let mut repo = DbUserRepository { connection: conn };
 
         let user = NewUser {
             username: &"John Doe".to_string(),
@@ -59,15 +63,15 @@ mod test {
         };
 
         // then: no user in the db, empty vector
-        let result = repo.find_all();
+        let result = repo.get_all();
         assert_eq!(result.unwrap().len(), 0);
 
         // when
         create_user(user, &mut repo);
 
         // then
-        let result = repo.find_all();
-        assert!(result.is_ok());
+        let result = repo.get_all();
+        assert!(result.is_some());
         let result = result.unwrap();
         assert_eq!(result.len(), 1);
         let first = &result[0];
