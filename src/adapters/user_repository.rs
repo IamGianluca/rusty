@@ -42,7 +42,7 @@ impl UserRepository for DbUserRepository<'_> {
 
 #[cfg(test)]
 mod test {
-    use crate::adapters::repository::{DbUserRepository, UserRepository};
+    use crate::adapters::user_repository::{DbUserRepository, UserRepository};
     use crate::domain::user::NewUser;
     use diesel::prelude::*;
     use dotenvy::dotenv;

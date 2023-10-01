@@ -1,7 +1,7 @@
 use crate::{
     adapters::{
         message_repository::MessageRepository,
-        repository::{DbUserRepository, UserRepository},
+        user_repository::{DbUserRepository, UserRepository},
     },
     domain::{message::NewMessage, user::NewUser},
 };
@@ -17,8 +17,8 @@ fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
 #[cfg(test)]
 mod test {
     use crate::adapters::message_repository::{DbMessageRepository, MessageRepository};
-    use crate::adapters::repository::DbUserRepository;
-    use crate::adapters::repository::UserRepository;
+    use crate::adapters::user_repository::DbUserRepository;
+    use crate::adapters::user_repository::UserRepository;
     use crate::domain::channel::NewChannel;
     use crate::domain::message::NewMessage;
     use crate::domain::user::NewUser;
