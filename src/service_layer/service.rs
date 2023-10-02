@@ -77,7 +77,7 @@ mod test {
     }
 
     #[test]
-    fn test_send_message() {
+    fn test_service_send_message() {
         // given
         let conn = &mut get_database_connection();
         let mut repo = DbMessageRepository { connection: conn };
