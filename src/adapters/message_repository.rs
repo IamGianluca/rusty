@@ -10,11 +10,11 @@ use super::schema::messages;
 use super::schema::users;
 
 pub trait MessageRepository {
-    fn save_user(&mut self, user: NewUser);
+    fn save_user(&mut self, user: &NewUser);
     fn get_user_by_id(&mut self, id: i32) -> Option<User>;
-    fn save_channel(&mut self, channel: NewChannel);
+    fn save_channel(&mut self, channel: &NewChannel);
     fn get_channel_by_id(&mut self, id: i32) -> Option<Channel>;
-    fn save_message(&mut self, message: NewMessage);
+    fn save_message(&mut self, message: &NewMessage);
     fn get_message_by_id(&mut self, id: i32) -> Option<Message>;
 }
 
@@ -24,9 +24,9 @@ pub struct DbMessageRepository<'a> {
 
 impl MessageRepository for DbMessageRepository<'_> {
     // user
-    fn save_user(&mut self, user: NewUser) {
+    fn save_user(&mut self, user: &NewUser) {
         let _rows_inserted = diesel::insert_into(users::table)
-            .values(&user)
+            .values(user)
             .execute(&mut *self.connection);
     }
     fn get_user_by_id(&mut self, id: i32) -> Option<User> {
@@ -35,9 +35,9 @@ impl MessageRepository for DbMessageRepository<'_> {
     }
 
     // channel
-    fn save_channel(&mut self, channel: NewChannel) {
+    fn save_channel(&mut self, channel: &NewChannel) {
         let _rows_inserted = diesel::insert_into(channels::table)
-            .values(&channel)
+            .values(channel)
             .execute(&mut *self.connection);
     }
 
@@ -47,9 +47,9 @@ impl MessageRepository for DbMessageRepository<'_> {
     }
 
     // message
-    fn save_message(&mut self, message: NewMessage) {
+    fn save_message(&mut self, message: &NewMessage) {
         let _rows_inserted = diesel::insert_into(messages::table)
-            .values(&message)
+            .values(message)
             .execute(&mut *self.connection);
     }
 

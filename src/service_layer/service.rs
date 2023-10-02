@@ -8,7 +8,7 @@ fn create_user(user: NewUser, repo: &mut dyn UserRepository) {
 }
 
 fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
-    repo.save_message(message)
+    repo.save_message(&message)
 }
 
 #[cfg(test)]
@@ -86,12 +86,12 @@ mod test {
             username: &"John Doe".to_string(),
             email: &"johndoe@example.com".to_string(),
         };
-        repo.save_user(user);
+        repo.save_user(&user);
         let channel = NewChannel {
             name: &"fake channel",
             description: &"a channel",
         };
-        repo.save_channel(channel);
+        repo.save_channel(&channel);
 
         // when
         let message = NewMessage {
