@@ -8,7 +8,7 @@ fn create_user(user: NewUser, repo: &mut dyn UserRepository) {
 }
 
 fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
-    repo.save_message(&message)
+    let _ = repo.save_message(&message);
 }
 
 #[cfg(test)]

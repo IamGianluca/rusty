@@ -10,11 +10,11 @@ use super::schema::messages;
 use super::schema::users;
 
 pub trait MessageRepository {
-    fn save_user(&mut self, user: &NewUser);
+    fn save_user(&mut self, user: &NewUser) -> i32;
     fn get_user_by_id(&mut self, id: i32) -> Option<User>;
-    fn save_channel(&mut self, channel: &NewChannel);
+    fn save_channel(&mut self, channel: &NewChannel) -> i32;
     fn get_channel_by_id(&mut self, id: i32) -> Option<Channel>;
-    fn save_message(&mut self, message: &NewMessage);
+    fn save_message(&mut self, message: &NewMessage) -> i32;
     fn get_message_by_id(&mut self, id: i32) -> Option<Message>;
 }
 
@@ -24,10 +24,12 @@ pub struct DbMessageRepository<'a> {
 
 impl MessageRepository for DbMessageRepository<'_> {
     // user
-    fn save_user(&mut self, user: &NewUser) {
-        let _rows_inserted = diesel::insert_into(users::table)
+    fn save_user(&mut self, user: &NewUser) -> i32 {
+        let row_inserted = diesel::insert_into(users::table)
             .values(user)
-            .execute(&mut *self.connection);
+            .get_result::<User>(&mut *self.connection)
+            .unwrap();
+        row_inserted.id
     }
     fn get_user_by_id(&mut self, id: i32) -> Option<User> {
         let user: User = users::table.find(id).first(&mut *self.connection).ok()?;
@@ -35,10 +37,12 @@ impl MessageRepository for DbMessageRepository<'_> {
     }
 
     // channel
-    fn save_channel(&mut self, channel: &NewChannel) {
-        let _rows_inserted = diesel::insert_into(channels::table)
+    fn save_channel(&mut self, channel: &NewChannel) -> i32 {
+        let row_inserted = diesel::insert_into(channels::table)
             .values(channel)
-            .execute(&mut *self.connection);
+            .get_result::<Channel>(&mut *self.connection)
+            .unwrap();
+        row_inserted.id
     }
 
     fn get_channel_by_id(&mut self, id: i32) -> Option<Channel> {
@@ -47,10 +51,12 @@ impl MessageRepository for DbMessageRepository<'_> {
     }
 
     // message
-    fn save_message(&mut self, message: &NewMessage) {
-        let _rows_inserted = diesel::insert_into(messages::table)
+    fn save_message(&mut self, message: &NewMessage) -> i32 {
+        let row_inserted = diesel::insert_into(messages::table)
             .values(message)
-            .execute(&mut *self.connection);
+            .get_result::<Message>(&mut *self.connection)
+            .unwrap();
+        row_inserted.id
     }
 
     fn get_message_by_id(&mut self, id: i32) -> Option<Message> {
