@@ -1,9 +1,8 @@
 use diesel::prelude::*;
 
-use crate::domain::channel::NewChannel;
+use crate::domain::channel::{Channel, NewChannel};
 use crate::domain::message::{Message, NewMessage};
-use crate::domain::user::NewUser;
-use crate::domain::{channel::Channel, user::User};
+use crate::domain::user::{NewUser, User};
 
 use super::schema::channels;
 use super::schema::messages;
