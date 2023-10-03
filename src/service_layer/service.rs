@@ -14,17 +14,14 @@ fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
 #[cfg(test)]
 mod test {
     use crate::adapters::message_repository::{DbMessageRepository, MessageRepository};
-    use crate::adapters::user_repository::DbUserRepository;
-    use crate::adapters::user_repository::UserRepository;
+    use crate::adapters::user_repository::{DbUserRepository, UserRepository};
     use crate::domain::channel::NewChannel;
     use crate::domain::message::NewMessage;
     use crate::domain::user::NewUser;
-    use crate::service_layer::service::send_message;
+    use crate::service_layer::service::{create_user, send_message};
     use diesel::prelude::*;
     use dotenvy::dotenv;
     use std::env;
-
-    use super::create_user;
 
     fn rebuild_database() {
         use std::process::Command;
@@ -32,8 +29,7 @@ mod test {
             .arg("migration")
             .arg("redo")
             .output()
-            // rename error message
-            .expect("Something is wrong");
+            .expect("Could not complete database migration.");
     }
 
     fn get_database_url() -> String {
