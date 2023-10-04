@@ -20,7 +20,7 @@ struct Info {
 #[post("/user")]
 async fn user(info: web::Json<Info>) -> impl Responder {
     let conn = &mut crate::adapters::utils::get_database_connection();
-    let repo = &mut crate::adapters::user_repository::DbUserRepository { connection: conn };
+    let repo = &mut crate::adapters::user_repository::DbUserRepository { conn: conn };
 
     let user = crate::domain::user::NewUser {
         username: &info.username,

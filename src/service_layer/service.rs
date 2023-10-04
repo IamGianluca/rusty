@@ -25,7 +25,7 @@ mod test {
     fn test_service_create_user() {
         // given
         let conn = &mut get_new_database_connection();
-        let mut repo = DbUserRepository { connection: conn };
+        let mut repo = DbUserRepository { conn };
 
         let user = NewUser {
             username: &"John Doe".to_string(),
@@ -53,7 +53,7 @@ mod test {
     fn test_service_send_message() {
         // given
         let conn = &mut get_new_database_connection();
-        let mut repo = DbMessageRepository { connection: conn };
+        let mut repo = DbMessageRepository { conn };
 
         let user = NewUser {
             username: &"John Doe".to_string(),

@@ -11,19 +11,19 @@ pub trait UserRepository {
 }
 
 pub struct DbUserRepository<'a> {
-    pub connection: &'a mut PgConnection,
+    pub conn: &'a mut PgConnection,
 }
 
 impl UserRepository for DbUserRepository<'_> {
     fn get_user_by_id(&mut self, id: i32) -> Option<User> {
-        let user: User = users::table.find(id).first(&mut *self.connection).ok()?;
+        let user: User = users::table.find(id).first(&mut *self.conn).ok()?;
         Some(user)
     }
 
     fn get_all(&mut self) -> Option<Vec<User>> {
         let result: Vec<User> = users::table
             .select(User::as_select())
-            .load(&mut *self.connection)
+            .load(&mut *self.conn)
             .ok()?;
         Some(result)
     }
@@ -33,7 +33,7 @@ impl UserRepository for DbUserRepository<'_> {
 
         let inserted_user = diesel::insert_into(users)
             .values(user)
-            .get_result::<User>(&mut *self.connection);
+            .get_result::<User>(&mut *self.conn);
         inserted_user.unwrap().id
     }
 }
@@ -50,7 +50,7 @@ mod test {
         let conn = &mut get_new_database_connection();
 
         // when
-        let mut repo = DbUserRepository { connection: conn };
+        let mut repo = DbUserRepository { conn };
         let user = NewUser {
             username: &"John Doe".to_string(),
             email: &"johndoe@example.com".to_string(),
@@ -67,7 +67,7 @@ mod test {
         let conn = &mut get_new_database_connection();
 
         // when
-        let mut repo = DbUserRepository { connection: conn };
+        let mut repo = DbUserRepository { conn };
         let result = repo.get_user_by_id(1);
 
         // then
@@ -79,7 +79,7 @@ mod test {
         // given
         let conn = &mut get_new_database_connection();
 
-        let mut repo = DbUserRepository { connection: conn };
+        let mut repo = DbUserRepository { conn };
         let inserted_user = NewUser {
             username: &"John Doe".to_string(),
             email: &"johndoe@example.com".to_string(),
