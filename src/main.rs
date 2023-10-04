@@ -1,9 +1,10 @@
+use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use serde::Deserialize;
+
 pub mod adapters;
 pub mod client;
 pub mod domain;
 pub mod service_layer;
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
-use serde::Deserialize;
 
 #[get("/")]
 async fn hello() -> impl Responder {
