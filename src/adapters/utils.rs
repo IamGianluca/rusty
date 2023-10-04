@@ -16,8 +16,14 @@ fn get_database_url() -> String {
     env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set.")
 }
 
-pub fn get_database_connection() -> diesel::PgConnection {
+pub fn get_new_database_connection() -> diesel::PgConnection {
     rebuild_database();
+    let database_url = get_database_url();
+    PgConnection::establish(&database_url)
+        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
+}
+
+pub fn get_database_connection() -> diesel::PgConnection {
     let database_url = get_database_url();
     PgConnection::establish(&database_url)
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
