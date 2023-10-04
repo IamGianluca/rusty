@@ -52,9 +52,3 @@ $ make stop_db
 - [Diesel](https://github.com/diesel-rs/diesel)
 - [PostgreSQL](https://github.com/postgres/postgres)
 - [Actix Web](https://github.com/actix/actix-web)
-
-### TODO
-
-- [ ] Web Framework: That can be used by clients to communicate with the backend server
-- [ ] Message Server: Listens to updates from the backend server. Fans out real-time events to all clients (within a workspace)
-- [ ] Load testing
