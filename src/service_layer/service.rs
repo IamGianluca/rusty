@@ -15,34 +15,11 @@ fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
 mod test {
     use crate::adapters::message_repository::{DbMessageRepository, MessageRepository};
     use crate::adapters::user_repository::{DbUserRepository, UserRepository};
+    use crate::adapters::utils::get_database_connection;
     use crate::domain::channel::NewChannel;
     use crate::domain::message::NewMessage;
     use crate::domain::user::NewUser;
     use crate::service_layer::service::{create_user, send_message};
-    use diesel::prelude::*;
-    use dotenvy::dotenv;
-    use std::env;
-
-    fn rebuild_database() {
-        use std::process::Command;
-        Command::new("diesel")
-            .arg("migration")
-            .arg("redo")
-            .output()
-            .expect("Could not complete database migration.");
-    }
-
-    fn get_database_url() -> String {
-        dotenv().ok();
-        env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set.")
-    }
-
-    fn get_database_connection() -> diesel::PgConnection {
-        rebuild_database();
-        let database_url = get_database_url();
-        PgConnection::establish(&database_url)
-            .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
-    }
 
     #[test]
     fn test_service_create_user() {
