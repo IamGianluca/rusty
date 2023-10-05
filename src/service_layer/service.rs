@@ -15,7 +15,7 @@ pub fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
 mod test {
     use crate::adapters::message_repository::{DbMessageRepository, MessageRepository};
     use crate::adapters::user_repository::{DbUserRepository, UserRepository};
-    use crate::adapters::utils::get_new_database_connection;
+    use crate::adapters::utils::get_new_test_database_connection;
     use crate::domain::channel::NewChannel;
     use crate::domain::message::NewMessage;
     use crate::domain::user::NewUser;
@@ -24,7 +24,7 @@ mod test {
     #[test]
     fn test_service_create_user() {
         // given
-        let conn = &mut get_new_database_connection();
+        let conn = &mut get_new_test_database_connection();
         let mut repo = DbUserRepository { conn };
 
         let user = NewUser {
@@ -52,7 +52,7 @@ mod test {
     #[test]
     fn test_service_send_message() {
         // given
-        let conn = &mut get_new_database_connection();
+        let conn = &mut get_new_test_database_connection();
         let mut repo = DbMessageRepository { conn };
 
         let user = NewUser {

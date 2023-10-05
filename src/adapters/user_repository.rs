@@ -41,13 +41,13 @@ impl UserRepository for DbUserRepository<'_> {
 #[cfg(test)]
 mod test {
     use crate::adapters::user_repository::{DbUserRepository, UserRepository};
-    use crate::adapters::utils::get_new_database_connection;
+    use crate::adapters::utils::get_new_test_database_connection;
     use crate::domain::user::NewUser;
 
     #[test]
     fn test_create_method() {
         // given
-        let conn = &mut get_new_database_connection();
+        let conn = &mut get_new_test_database_connection();
 
         // when
         let mut repo = DbUserRepository { conn };
@@ -64,7 +64,7 @@ mod test {
     #[test]
     fn test_get_method_with_empty_user_table() {
         // given
-        let conn = &mut get_new_database_connection();
+        let conn = &mut get_new_test_database_connection();
 
         // when
         let mut repo = DbUserRepository { conn };
@@ -77,7 +77,7 @@ mod test {
     #[test]
     fn test_get_user_that_was_just_added() {
         // given
-        let conn = &mut get_new_database_connection();
+        let conn = &mut get_new_test_database_connection();
 
         let mut repo = DbUserRepository { conn };
         let inserted_user = NewUser {
