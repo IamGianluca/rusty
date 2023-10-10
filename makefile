@@ -22,3 +22,5 @@ prepare_db:
 test: 
 	cargo test -- --test-threads=1
 
+format:
+	cargo fmt
