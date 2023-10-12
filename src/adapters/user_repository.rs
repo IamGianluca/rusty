@@ -42,7 +42,7 @@ impl UserRepository for DbUserRepository<'_> {
 mod test {
     use crate::adapters::user_repository::{DbUserRepository, UserRepository};
     use crate::adapters::utils::get_new_test_database_connection;
-    use crate::domain::user::NewUser;
+    use crate::utils::create_test_user;
 
     #[test]
     fn test_create_method() {
@@ -51,10 +51,7 @@ mod test {
 
         // when
         let mut repo = DbUserRepository { conn };
-        let user = NewUser {
-            username: &"John Doe".to_string(),
-            email: &"johndoe@example.com".to_string(),
-        };
+        let user = create_test_user();
         let result = repo.save_user(&user);
 
         // then
@@ -80,16 +77,13 @@ mod test {
         let conn = &mut get_new_test_database_connection();
 
         let mut repo = DbUserRepository { conn };
-        let inserted_user = NewUser {
-            username: &"John Doe".to_string(),
-            email: &"johndoe@example.com".to_string(),
-        };
-        let id = repo.save_user(&inserted_user);
+        let new_user = create_test_user();
+        let id = repo.save_user(&new_user);
 
         // when
         let retrieved_user = repo.get_user_by_id(id).unwrap();
 
         // then
-        assert_eq!(retrieved_user.username, inserted_user.username)
+        assert_eq!(retrieved_user.username, new_user.username)
     }
 }

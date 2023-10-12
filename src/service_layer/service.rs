@@ -18,19 +18,16 @@ mod test {
     use crate::adapters::utils::get_new_test_database_connection;
     use crate::domain::channel::NewChannel;
     use crate::domain::message::NewMessage;
-    use crate::domain::user::NewUser;
     use crate::service_layer::service::{create_user, send_message};
 
+    use crate::utils::create_test_user;
     #[test]
     fn test_service_create_user() {
         // given
         let conn = &mut get_new_test_database_connection();
         let mut repo = DbUserRepository { conn };
 
-        let user = NewUser {
-            username: &"John Doe".to_string(),
-            email: &"johndoe@example.com".to_string(),
-        };
+        let user = create_test_user();
 
         // then: no user in the db, empty vector
         let result = repo.get_all();
@@ -55,10 +52,7 @@ mod test {
         let conn = &mut get_new_test_database_connection();
         let mut repo = DbMessageRepository { conn };
 
-        let user = NewUser {
-            username: &"John Doe".to_string(),
-            email: &"johndoe@example.com".to_string(),
-        };
+        let user = create_test_user();
         repo.save_user(&user);
         let channel = NewChannel {
             name: &"fake channel",

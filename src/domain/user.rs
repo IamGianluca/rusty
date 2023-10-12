@@ -22,14 +22,11 @@ pub struct NewUser<'a> {
 #[cfg(test)]
 mod test {
 
-    use crate::domain::user::NewUser;
+    use crate::utils::create_test_user;
 
     #[test]
     fn test_create_user() {
-        let user1 = NewUser {
-            username: &"user1".to_string(),
-            email: &"fake@email.com".to_string(),
-        };
-        assert_eq!(user1.username, "user1")
+        let user1 = create_test_user();
+        assert_eq!(user1.username, "John Doe")
     }
 }

@@ -5,6 +5,7 @@ pub mod adapters;
 pub mod client;
 pub mod domain;
 pub mod service_layer;
+pub mod utils;
 
 #[get("/")]
 async fn hello() -> impl Responder {
