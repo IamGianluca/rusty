@@ -31,7 +31,7 @@ impl Client {
                 return Ok(Client {
                     user: User {
                         id: 1,
-                        username: "Jane Doe".to_string(),
+                        username: "John Doe".to_string(),
                         email: "johndoe@example.com".to_string(),
                         created_at: Utc::now(),
                     },
@@ -51,7 +51,7 @@ mod test {
         let response = Client::new("token".to_string());
         assert!(response.is_ok());
         let client = response.unwrap();
-        assert_eq!(client.user.username, "Jane Doe")
+        assert_eq!(client.user.username, "John Doe")
     }
 
     #[test]

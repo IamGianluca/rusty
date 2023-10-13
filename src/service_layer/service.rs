@@ -3,6 +3,13 @@ use crate::{
     domain::{message::NewMessage, user::NewUser},
 };
 
+pub fn authenticate_user(user: &str, repo: &mut dyn UserRepository) -> bool {
+    match repo.get_user_by_name(user) {
+        Some(_) => true,
+        None => false,
+    }
+}
+
 pub fn create_user(user: NewUser, repo: &mut dyn UserRepository) {
     let _ = repo.save_user(&user);
 }
@@ -18,7 +25,7 @@ mod test {
     use crate::adapters::utils::get_new_test_database_connection;
     use crate::domain::channel::NewChannel;
     use crate::domain::message::NewMessage;
-    use crate::service_layer::service::{create_user, send_message};
+    use crate::service_layer::service::{authenticate_user, create_user, send_message};
 
     use crate::utils::create_test_user;
     #[test]
@@ -72,5 +79,28 @@ mod test {
         let result = repo.get_message_by_id(1);
         assert!(result.is_some());
         assert_eq!(result.unwrap().content, "something")
+    }
+
+    #[test]
+    fn test_service_authenticate_user() {
+        // given
+        let conn = &mut get_new_test_database_connection();
+        let mut repo = DbUserRepository { conn };
+
+        // when
+        let response = authenticate_user("John Doe", &mut repo);
+
+        // then
+        assert!(!response);
+
+        // given
+        let user = create_test_user();
+        repo.save_user(&user);
+
+        // when
+        let response = authenticate_user("John Doe", &mut repo);
+
+        // then
+        assert!(response);
     }
 }
