@@ -19,6 +19,12 @@ prepare_db:
 	diesel setup && \
 	diesel migration run 
 
+restart_db:
+	make stop_db && \
+	make start_db && \
+	sleep 3 && \
+	make prepare_db
+
 test: 
 	cargo test -- --test-threads=1
 
