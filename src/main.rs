@@ -15,6 +15,7 @@ async fn hello() -> impl Responder {
 #[derive(Deserialize)]
 struct UserPayload {
     username: String,
+    password: String,
     email: String,
 }
 
@@ -24,10 +25,11 @@ async fn user(info: web::Json<UserPayload>) -> impl Responder {
         username: &info.username,
         email: &info.email,
     };
+    let password = &info.password;
 
     let conn = &mut crate::adapters::utils::get_database_connection();
     let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
-    service_layer::service::create_user(user, repo);
+    service_layer::service::create_user(user, password, repo);
 
     HttpResponse::Ok()
 }

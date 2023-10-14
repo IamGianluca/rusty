@@ -10,6 +10,15 @@ diesel::table! {
 }
 
 diesel::table! {
+    credentials (id) {
+        id -> Int4,
+        user_id -> Int4,
+        password -> Text,
+        created_at -> Timestamptz,
+    }
+}
+
+diesel::table! {
     messages (id) {
         id -> Int4,
         channel_id -> Int4,
@@ -28,11 +37,13 @@ diesel::table! {
     }
 }
 
+diesel::joinable!(credentials -> users (user_id));
 diesel::joinable!(messages -> channels (channel_id));
 diesel::joinable!(messages -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     channels,
+    credentials,
     messages,
     users,
 );

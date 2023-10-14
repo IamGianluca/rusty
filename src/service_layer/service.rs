@@ -1,6 +1,6 @@
 use crate::{
     adapters::{message_repository::MessageRepository, user_repository::UserRepository},
-    domain::{message::NewMessage, user::NewUser},
+    domain::{auth::NewPassword, message::NewMessage, user::NewUser},
 };
 
 pub fn authenticate_user(user: &str, repo: &mut dyn UserRepository) -> bool {
@@ -10,8 +10,14 @@ pub fn authenticate_user(user: &str, repo: &mut dyn UserRepository) -> bool {
     }
 }
 
-pub fn create_user(user: NewUser, repo: &mut dyn UserRepository) {
-    let _ = repo.save_user(&user);
+pub fn create_user(user: NewUser, password: &str, repo: &mut dyn UserRepository) {
+    // todo: this operation should be done as one transaction
+    let user_id = repo.save_user(&user);
+    let creds = NewPassword {
+        user_id: &user_id,
+        password,
+    };
+    let _ = repo.update_password(&creds);
 }
 
 pub fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
@@ -34,23 +40,23 @@ mod test {
         let conn = &mut get_new_test_database_connection();
         let mut repo = DbUserRepository { conn };
 
-        let user = create_test_user();
-
         // then: no user in the db, empty vector
-        let result = repo.get_all();
-        assert_eq!(result.unwrap().len(), 0);
+        let result = repo.get_all().unwrap();
+        assert_eq!(result.len(), 0);
 
         // when
-        create_user(user, &mut repo);
+        let user = create_test_user();
+        let password = "password";
+        create_user(user, password, &mut repo);
 
         // then
-        let result = repo.get_all();
-        assert!(result.is_some());
-        let result = result.unwrap();
+        let result = repo.get_all().unwrap();
         assert_eq!(result.len(), 1);
-        let first = &result[0];
-        assert_eq!(first.username, "John Doe");
-        assert_eq!(first.email, "johndoe@example.com")
+        let retrieved_user = &result[0];
+        assert_eq!(retrieved_user.username, "John Doe");
+        assert_eq!(retrieved_user.email, "johndoe@example.com");
+        let result = repo.get_password(retrieved_user).unwrap();
+        assert_eq!(result.password, password)
     }
 
     #[test]

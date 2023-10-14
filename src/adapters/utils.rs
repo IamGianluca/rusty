@@ -7,6 +7,7 @@ fn rebuild_database() {
     Command::new("diesel")
         .arg("migration")
         .arg("redo")
+        .arg("--all")
         .output()
         .expect("Something is wrong");
 }

@@ -1,3 +1,4 @@
+use crate::domain::auth::{NewPassword, Password};
 use crate::domain::user::{NewUser, User};
 use diesel::prelude::*;
 use diesel::{self, PgConnection};
@@ -6,6 +7,8 @@ use super::schema::users;
 
 pub trait UserRepository {
     fn save_user(&mut self, user: &NewUser) -> i32;
+    fn update_password(&mut self, credentials: &NewPassword) -> bool;
+    fn get_password(&mut self, user: &User) -> Option<Password>;
     fn get_user_by_id(&mut self, id: i32) -> Option<User>;
     fn get_user_by_name(&mut self, name: &str) -> Option<User>;
     fn get_all(&mut self) -> Option<Vec<User>>;
@@ -23,6 +26,22 @@ impl UserRepository for DbUserRepository<'_> {
             .values(user)
             .get_result::<User>(&mut *self.conn);
         inserted_user.unwrap().id
+    }
+
+    fn update_password(&mut self, credential: &NewPassword) -> bool {
+        use crate::adapters::schema::credentials::dsl::*;
+        let _ = diesel::insert_into(credentials)
+            .values(credential)
+            .get_result::<Password>(&mut *self.conn);
+        true
+    }
+
+    fn get_password(&mut self, user: &User) -> Option<Password> {
+        use crate::adapters::schema::credentials::dsl::*;
+        credentials
+            .filter(user_id.eq(user.id))
+            .first::<Password>(&mut *self.conn)
+            .ok()
     }
 
     fn get_user_by_id(&mut self, id: i32) -> Option<User> {
