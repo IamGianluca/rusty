@@ -3,14 +3,12 @@ use crate::domain::user::{NewUser, User};
 use diesel::prelude::*;
 use diesel::{self, PgConnection};
 
-use super::schema::users;
-
 pub trait UserRepository {
     fn save_user(&mut self, user: &NewUser) -> i32;
-    fn update_password(&mut self, credentials: &NewPassword) -> bool;
-    fn get_password(&mut self, user: &User) -> Option<Password>;
     fn get_user_by_id(&mut self, id: i32) -> Option<User>;
     fn get_user_by_name(&mut self, name: &str) -> Option<User>;
+    fn update_password(&mut self, credentials: &NewPassword) -> bool;
+    fn get_password(&mut self, user: &User) -> Option<Password>;
     fn get_all(&mut self) -> Option<Vec<User>>;
 }
 
@@ -28,8 +26,24 @@ impl UserRepository for DbUserRepository<'_> {
         inserted_user.unwrap().id
     }
 
+    fn get_user_by_id(&mut self, user_id: i32) -> Option<User> {
+        use crate::adapters::schema::users::dsl::*;
+
+        users.filter(id.eq(user_id)).first(&mut *self.conn).ok()
+    }
+
+    fn get_user_by_name(&mut self, name: &str) -> Option<User> {
+        use crate::adapters::schema::users::dsl::*;
+
+        users
+            .filter(username.eq(name))
+            .first::<User>(&mut *self.conn)
+            .ok()
+    }
+
     fn update_password(&mut self, credential: &NewPassword) -> bool {
         use crate::adapters::schema::credentials::dsl::*;
+
         let _ = diesel::insert_into(credentials)
             .values(credential)
             .get_result::<Password>(&mut *self.conn);
@@ -38,31 +52,17 @@ impl UserRepository for DbUserRepository<'_> {
 
     fn get_password(&mut self, user: &User) -> Option<Password> {
         use crate::adapters::schema::credentials::dsl::*;
+
         credentials
             .filter(user_id.eq(user.id))
             .first::<Password>(&mut *self.conn)
             .ok()
     }
 
-    fn get_user_by_id(&mut self, id: i32) -> Option<User> {
-        let user: User = users::table.find(id).first(&mut *self.conn).ok()?;
-        Some(user)
-    }
-
-    fn get_user_by_name(&mut self, name: &str) -> Option<User> {
-        use crate::adapters::schema::users::dsl::*;
-        users
-            .filter(username.eq(name))
-            .first::<User>(&mut *self.conn)
-            .ok()
-    }
-
     fn get_all(&mut self) -> Option<Vec<User>> {
-        let result: Vec<User> = users::table
-            .select(User::as_select())
-            .load(&mut *self.conn)
-            .ok()?;
-        Some(result)
+        use crate::adapters::schema::users::dsl::*;
+
+        users.select(User::as_select()).load(&mut *self.conn).ok()
     }
 }
 
