@@ -12,16 +12,16 @@ pub fn authenticate_user(user: &str, repo: &mut dyn UserRepository) -> bool {
 
 pub fn create_user(user: NewUser, password: &str, repo: &mut dyn UserRepository) {
     // todo: this operation should be done as one transaction
-    let user_id = repo.save_user(&user);
+    let user_id = repo.add_user(&user);
     let creds = NewPassword {
         user_id: &user_id,
         password,
     };
-    let _ = repo.update_password(&creds);
+    let _ = repo.add_password(&creds);
 }
 
 pub fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
-    let _ = repo.save_message(&message);
+    let _ = repo.add_message(&message);
 }
 
 #[cfg(test)]
@@ -55,7 +55,7 @@ mod test {
         let retrieved_user = &result[0];
         assert_eq!(retrieved_user.username, "John Doe");
         assert_eq!(retrieved_user.email, "johndoe@example.com");
-        let result = repo.get_password(retrieved_user).unwrap();
+        let result = repo.get_password_by_user_id(retrieved_user.id).unwrap();
         assert_eq!(result.password, password)
     }
 
@@ -66,12 +66,12 @@ mod test {
         let mut repo = DbMessageRepository { conn };
 
         let user = create_test_user();
-        repo.save_user(&user);
+        repo.add_user(&user);
         let channel = NewChannel {
             name: &"fake channel",
             description: &"a channel",
         };
-        repo.save_channel(&channel);
+        repo.add_channel(&channel);
 
         // when
         let message = NewMessage {
@@ -101,7 +101,7 @@ mod test {
 
         // given
         let user = create_test_user();
-        repo.save_user(&user);
+        repo.add_user(&user);
 
         // when
         let response = authenticate_user("John Doe", &mut repo);

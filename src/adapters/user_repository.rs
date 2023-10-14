@@ -4,11 +4,11 @@ use diesel::prelude::*;
 use diesel::{self, PgConnection};
 
 pub trait UserRepository {
-    fn save_user(&mut self, user: &NewUser) -> i32;
+    fn add_user(&mut self, user: &NewUser) -> i32;
     fn get_user_by_id(&mut self, id: i32) -> Option<User>;
     fn get_user_by_name(&mut self, name: &str) -> Option<User>;
-    fn update_password(&mut self, credentials: &NewPassword) -> bool;
-    fn get_password(&mut self, user: &User) -> Option<Password>;
+    fn add_password(&mut self, credential: &NewPassword) -> i32;
+    fn get_password_by_user_id(&mut self, user_id: i32) -> Option<Password>;
     fn get_all(&mut self) -> Option<Vec<User>>;
 }
 
@@ -17,7 +17,7 @@ pub struct DbUserRepository<'a> {
 }
 
 impl UserRepository for DbUserRepository<'_> {
-    fn save_user(&mut self, user: &NewUser) -> i32 {
+    fn add_user(&mut self, user: &NewUser) -> i32 {
         use crate::adapters::schema::users::dsl::*;
 
         let inserted_user = diesel::insert_into(users)
@@ -41,20 +41,20 @@ impl UserRepository for DbUserRepository<'_> {
             .ok()
     }
 
-    fn update_password(&mut self, credential: &NewPassword) -> bool {
+    fn add_password(&mut self, credential: &NewPassword) -> i32 {
         use crate::adapters::schema::credentials::dsl::*;
 
-        let _ = diesel::insert_into(credentials)
+        let inserted_password = diesel::insert_into(credentials)
             .values(credential)
             .get_result::<Password>(&mut *self.conn);
-        true
+        inserted_password.unwrap().id
     }
 
-    fn get_password(&mut self, user: &User) -> Option<Password> {
+    fn get_password_by_user_id(&mut self, user_id: i32) -> Option<Password> {
         use crate::adapters::schema::credentials::dsl::*;
 
         credentials
-            .filter(user_id.eq(user.id))
+            .filter(user_id.eq(user_id))
             .first::<Password>(&mut *self.conn)
             .ok()
     }
@@ -80,7 +80,7 @@ mod test {
         // when
         let mut repo = DbUserRepository { conn };
         let user = create_test_user();
-        let result = repo.save_user(&user);
+        let result = repo.add_user(&user);
 
         // then
         assert_eq!(result, 1)
@@ -106,7 +106,7 @@ mod test {
 
         let mut repo = DbUserRepository { conn };
         let new_user = create_test_user();
-        let id = repo.save_user(&new_user);
+        let id = repo.add_user(&new_user);
 
         // when
         let retrieved_user = repo.get_user_by_id(id).unwrap();
@@ -121,7 +121,7 @@ mod test {
 
         let mut repo = DbUserRepository { conn };
         let new_user = create_test_user();
-        let _ = repo.save_user(&new_user);
+        let _ = repo.add_user(&new_user);
 
         // when
         let retrieved_user = repo.get_user_by_name(&"John Doe").unwrap();

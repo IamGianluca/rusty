@@ -5,12 +5,12 @@ use crate::domain::message::{Message, NewMessage};
 use crate::domain::user::{NewUser, User};
 
 pub trait MessageRepository {
-    fn save_user(&mut self, user: &NewUser) -> i32;
-    fn get_user_by_id(&mut self, id: i32) -> Option<User>;
-    fn save_channel(&mut self, channel: &NewChannel) -> i32;
-    fn get_channel_by_id(&mut self, id: i32) -> Option<Channel>;
-    fn save_message(&mut self, message: &NewMessage) -> i32;
-    fn get_message_by_id(&mut self, id: i32) -> Option<Message>;
+    fn add_user(&mut self, user: &NewUser) -> i32;
+    fn get_user_by_id(&mut self, user_id: i32) -> Option<User>;
+    fn add_channel(&mut self, channel: &NewChannel) -> i32;
+    fn get_channel_by_id(&mut self, channel_id: i32) -> Option<Channel>;
+    fn add_message(&mut self, message: &NewMessage) -> i32;
+    fn get_message_by_id(&mut self, message_id: i32) -> Option<Message>;
 }
 
 pub struct DbMessageRepository<'a> {
@@ -19,7 +19,7 @@ pub struct DbMessageRepository<'a> {
 
 impl MessageRepository for DbMessageRepository<'_> {
     // user
-    fn save_user(&mut self, user: &NewUser) -> i32 {
+    fn add_user(&mut self, user: &NewUser) -> i32 {
         use crate::adapters::schema::users::dsl::*;
 
         let row_inserted = diesel::insert_into(users)
@@ -31,12 +31,11 @@ impl MessageRepository for DbMessageRepository<'_> {
     fn get_user_by_id(&mut self, user_id: i32) -> Option<User> {
         use crate::adapters::schema::users::dsl::*;
 
-        let user: User = users.filter(id.eq(user_id)).first(&mut *self.conn).ok()?;
-        Some(user)
+        users.filter(id.eq(user_id)).first(&mut *self.conn).ok()
     }
 
     // channel
-    fn save_channel(&mut self, channel: &NewChannel) -> i32 {
+    fn add_channel(&mut self, channel: &NewChannel) -> i32 {
         use crate::adapters::schema::channels::dsl::*;
 
         let row_inserted = diesel::insert_into(channels)
@@ -49,15 +48,14 @@ impl MessageRepository for DbMessageRepository<'_> {
     fn get_channel_by_id(&mut self, channel_id: i32) -> Option<Channel> {
         use crate::adapters::schema::channels::dsl::*;
 
-        let channel: Channel = channels
+        channels
             .filter(id.eq(channel_id))
             .first(&mut *self.conn)
-            .ok()?;
-        Some(channel)
+            .ok()
     }
 
     // message
-    fn save_message(&mut self, message: &NewMessage) -> i32 {
+    fn add_message(&mut self, message: &NewMessage) -> i32 {
         use crate::adapters::schema::messages::dsl::*;
 
         let row_inserted = diesel::insert_into(messages)
@@ -70,10 +68,9 @@ impl MessageRepository for DbMessageRepository<'_> {
     fn get_message_by_id(&mut self, message_id: i32) -> Option<Message> {
         use crate::adapters::schema::messages::dsl::*;
 
-        let msg = messages
+        messages
             .filter(id.eq(message_id))
             .first(&mut *self.conn)
-            .ok()?;
-        Some(msg)
+            .ok()
     }
 }
