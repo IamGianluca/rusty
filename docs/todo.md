@@ -14,6 +14,11 @@
 
 - [ ] The creation of a new user and password should happen within the same db transaction
 
+#### Testing
+
+- [ ] Integration tests for `MessageRepository`
+- [ ] Create in-memory version of `UserRepository` and `MessageRepository` to speed up test suite
+
 #### Load Testing
 
 - [ ] Benchmark transactions/second (using sending a message as the transaction unit)

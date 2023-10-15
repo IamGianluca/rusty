@@ -2,7 +2,6 @@ use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
 use serde::Deserialize;
 
 pub mod adapters;
-pub mod client;
 pub mod domain;
 pub mod service_layer;
 pub mod utils;
@@ -20,7 +19,7 @@ struct UserPayload {
 }
 
 #[post("/user")]
-async fn user(info: web::Json<UserPayload>) -> impl Responder {
+async fn add_user_endpoint(info: web::Json<UserPayload>) -> impl Responder {
     let user = crate::domain::user::NewUser {
         username: &info.username,
         email: &info.email,
@@ -57,8 +56,13 @@ async fn message(info: web::Json<MessagePayload>) -> impl Responder {
 
 #[actix_web::main]
 pub async fn run() -> std::io::Result<()> {
-    HttpServer::new(|| App::new().service(hello).service(user).service(message))
-        .bind(("127.0.0.1", 8080))?
-        .run()
-        .await
+    HttpServer::new(|| {
+        App::new()
+            .service(hello)
+            .service(add_user_endpoint)
+            .service(message)
+    })
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }
