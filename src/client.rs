@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-
-use chrono::Utc;
-
 use crate::domain::user::User;
+use chrono::Utc;
+use std::collections::HashMap;
 
 pub struct TokenUserTable {
     token2username: HashMap<String, String>,
