@@ -1,6 +1,6 @@
 use crate::{
     adapters::{message_repository::MessageRepository, user_repository::UserRepository},
-    domain::{auth::NewPassword, message::NewMessage, user::NewUser},
+    domain::{auth::NewPassword, channel::NewChannel, message::NewMessage, user::NewUser},
 };
 
 pub fn authenticate_user(user: &str, repo: &mut dyn UserRepository) -> bool {
@@ -18,6 +18,10 @@ pub fn create_user(user: NewUser, password: &str, repo: &mut dyn UserRepository)
         password,
     };
     let _ = repo.add_password(&creds);
+}
+
+pub fn create_channel(channel: NewChannel, repo: &mut dyn MessageRepository) {
+    let _ = repo.add_channel(&channel);
 }
 
 pub fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
