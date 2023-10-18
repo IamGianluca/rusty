@@ -10,8 +10,9 @@ pub fn authenticate_user(user: &str, repo: &mut dyn UserRepository) -> bool {
     }
 }
 
-pub fn create_user(user: NewUser, password: &str, repo: &mut dyn UserRepository) {
+pub fn create_user(username: &str, email: &str, password: &str, repo: &mut dyn UserRepository) {
     // todo: this operation should be done as one transaction
+    let user = NewUser { username, email };
     let user_id = repo.add_user(&user);
     let creds = NewPassword {
         user_id: &user_id,
@@ -20,11 +21,22 @@ pub fn create_user(user: NewUser, password: &str, repo: &mut dyn UserRepository)
     let _ = repo.add_password(&creds);
 }
 
-pub fn create_channel(channel: NewChannel, repo: &mut dyn MessageRepository) {
+pub fn create_channel(name: &str, description: &str, repo: &mut dyn MessageRepository) {
+    let channel = NewChannel { name, description };
     let _ = repo.add_channel(&channel);
 }
 
-pub fn send_message(message: NewMessage, repo: &mut dyn MessageRepository) {
+pub fn create_message(
+    user_id: &i32,
+    channel_id: &i32,
+    content: &str,
+    repo: &mut dyn MessageRepository,
+) {
+    let message = NewMessage {
+        channel_id,
+        user_id,
+        content,
+    };
     let _ = repo.add_message(&message);
 }
 
@@ -34,8 +46,7 @@ mod test {
     use crate::adapters::user_repository::{DbUserRepository, UserRepository};
     use crate::adapters::utils::get_new_test_database_connection;
     use crate::domain::channel::NewChannel;
-    use crate::domain::message::NewMessage;
-    use crate::service_layer::service::{authenticate_user, create_user, send_message};
+    use crate::service_layer::service::{authenticate_user, create_message, create_user};
 
     use crate::utils::create_test_user;
     #[test]
@@ -49,9 +60,7 @@ mod test {
         assert_eq!(result.len(), 0);
 
         // when
-        let user = create_test_user();
-        let password = "password";
-        create_user(user, password, &mut repo);
+        create_user("John Doe", "johndoe@example.com", "password", &mut repo);
 
         // then
         let result = repo.get_all().unwrap();
@@ -60,11 +69,11 @@ mod test {
         assert_eq!(retrieved_user.username, "John Doe");
         assert_eq!(retrieved_user.email, "johndoe@example.com");
         let result = repo.get_password_by_user_id(retrieved_user.id).unwrap();
-        assert_eq!(result.password, password)
+        assert_eq!(result.password, "password")
     }
 
     #[test]
-    fn test_service_send_message() {
+    fn test_service_create_message() {
         // given
         let conn = &mut get_new_test_database_connection();
         let mut repo = DbMessageRepository { conn };
@@ -78,12 +87,7 @@ mod test {
         repo.add_channel(&channel);
 
         // when
-        let message = NewMessage {
-            channel_id: &1,
-            user_id: &1,
-            content: &"something",
-        };
-        send_message(message, &mut repo);
+        create_message(&1, &1, &"something", &mut repo);
 
         // then
         let result = repo.get_message_by_id(1);

@@ -3,21 +3,19 @@ use rusty::adapters::{message_repository::MessageRepository, user_repository::Us
 use serde_json::json;
 
 fn create_test_user() -> i32 {
-    let user = rusty::utils::create_test_user();
     let conn = &mut rusty::adapters::utils::get_test_database_connection();
     let repo = &mut rusty::adapters::user_repository::DbUserRepository { conn };
-    rusty::service_layer::service::create_user(user, "password", repo);
 
+    rusty::service_layer::service::create_user("John Doe", "johndoe@example.com", "password", repo);
     let users = repo.get_all().unwrap();
     users[0].id
 }
 
 fn create_test_channel() -> i32 {
-    let channel = rusty::utils::create_test_channel();
     let conn = &mut rusty::adapters::utils::get_test_database_connection();
     let repo = &mut rusty::adapters::message_repository::DbMessageRepository { conn };
-    rusty::service_layer::service::create_channel(channel, repo);
 
+    rusty::service_layer::service::create_channel("test channel", "a test channel", repo);
     let channel = repo.get_channel_by_id(1).unwrap();
     channel.id
 }
@@ -39,7 +37,7 @@ async fn test_server_is_running() {
 async fn test_add_user_endpoint() {
     // given
     rusty::adapters::utils::rebuild_database();
-    let app = test::init_service(App::new().service(rusty::add_user_endpoint)).await;
+    let app = test::init_service(App::new().service(rusty::create_user_endpoint)).await;
 
     // when
     let payload = json!({
@@ -61,7 +59,7 @@ async fn test_add_user_endpoint() {
 async fn test_add_channel_endpoint() {
     // given
     rusty::adapters::utils::rebuild_database();
-    let app = test::init_service(App::new().service(rusty::add_channel_endpoint)).await;
+    let app = test::init_service(App::new().service(rusty::create_channel_endpoint)).await;
 
     // when
     let payload = json!({
@@ -82,7 +80,7 @@ async fn test_add_channel_endpoint() {
 async fn test_add_message_endpoint() {
     // given
     rusty::adapters::utils::rebuild_database();
-    let app = test::init_service(App::new().service(rusty::add_message_endpoint)).await;
+    let app = test::init_service(App::new().service(rusty::create_message_endpoint)).await;
     let user_id = create_test_user();
     let channel_id = create_test_channel();
 
