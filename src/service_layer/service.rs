@@ -61,15 +61,16 @@ mod test {
 
         // when
         create_user("John Doe", "johndoe@example.com", "password", &mut repo);
+        create_user("Jane Doe", "janedoe@example.com", "xxxxxxxx", &mut repo);
 
         // then
         let result = repo.get_all().unwrap();
-        assert_eq!(result.len(), 1);
-        let retrieved_user = &result[0];
-        assert_eq!(retrieved_user.username, "John Doe");
-        assert_eq!(retrieved_user.email, "johndoe@example.com");
+        assert_eq!(result.len(), 2);
+        let retrieved_user = &result[1];
+        assert_eq!(retrieved_user.username, "Jane Doe");
+        assert_eq!(retrieved_user.email, "janedoe@example.com");
         let result = repo.get_password_by_user_id(retrieved_user.id).unwrap();
-        assert_eq!(result.password, "password")
+        assert_eq!(result.password, "xxxxxxxx")
     }
 
     #[test]

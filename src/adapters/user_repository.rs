@@ -50,11 +50,11 @@ impl UserRepository for DbUserRepository<'_> {
         inserted_password.unwrap().id
     }
 
-    fn get_password_by_user_id(&mut self, user_id: i32) -> Option<Password> {
+    fn get_password_by_user_id(&mut self, _user_id: i32) -> Option<Password> {
         use crate::adapters::schema::credentials::dsl::*;
 
         credentials
-            .filter(user_id.eq(user_id))
+            .filter(user_id.eq(_user_id))
             .first::<Password>(&mut *self.conn)
             .ok()
     }
