@@ -23,7 +23,7 @@ pub fn get_test_database_connection() -> diesel::PgConnection {
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
 
-pub fn get_new_test_database_connection() -> diesel::PgConnection {
+pub fn init_db() -> diesel::PgConnection {
     rebuild_database();
     let database_url = get_database_url();
     PgConnection::establish(&database_url)
