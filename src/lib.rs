@@ -20,7 +20,7 @@ struct UserPayload {
 
 #[post("/user")]
 async fn create_user_endpoint(info: web::Json<UserPayload>) -> impl Responder {
-    let conn = &mut crate::adapters::utils::get_database_connection();
+    let conn = &mut crate::adapters::utils::get_db_conn();
     let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
     service_layer::service::create_user(&info.username, &info.email, &info.password, repo);
     HttpResponse::Ok()
@@ -33,7 +33,7 @@ struct ChannelPayload {
 }
 #[post("/channel")]
 async fn create_channel_endpoint(info: web::Json<ChannelPayload>) -> impl Responder {
-    let conn = &mut crate::adapters::utils::get_database_connection();
+    let conn = &mut crate::adapters::utils::get_db_conn();
     let repo = &mut crate::adapters::channel_repository::DbChannelRepository { conn };
     service_layer::service::create_channel(&info.name, &info.description, repo);
     HttpResponse::Ok()
@@ -47,7 +47,7 @@ struct MessagePayload {
 }
 #[post("/message")]
 async fn create_message_endpoint(info: web::Json<MessagePayload>) -> impl Responder {
-    let conn = &mut crate::adapters::utils::get_database_connection();
+    let conn = &mut crate::adapters::utils::get_db_conn();
     let repo = &mut crate::adapters::channel_repository::DbChannelRepository { conn };
 
     service_layer::service::create_message(

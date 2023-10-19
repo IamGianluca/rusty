@@ -2,7 +2,7 @@ use diesel::prelude::*;
 use dotenvy::dotenv;
 use std::env;
 
-pub fn rebuild_database() {
+pub fn rebuild_db() {
     use std::process::Command;
     Command::new("diesel")
         .arg("migration")
@@ -12,26 +12,20 @@ pub fn rebuild_database() {
         .expect("Something is wrong");
 }
 
-fn get_database_url() -> String {
+fn get_db_url() -> String {
     dotenv().ok();
     env::var("DATABASE_URL").expect("DATABASE_URL environment variable is not set.")
 }
 
-pub fn get_test_database_connection() -> diesel::PgConnection {
-    let database_url = get_database_url();
-    PgConnection::establish(&database_url)
-        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
-}
-
 pub fn init_db() -> diesel::PgConnection {
-    rebuild_database();
-    let database_url = get_database_url();
+    rebuild_db();
+    let database_url = get_db_url();
     PgConnection::establish(&database_url)
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
 
-pub fn get_database_connection() -> diesel::PgConnection {
-    let database_url = get_database_url();
+pub fn get_db_conn() -> diesel::PgConnection {
+    let database_url = get_db_url();
     PgConnection::establish(&database_url)
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }

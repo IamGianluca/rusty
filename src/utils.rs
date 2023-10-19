@@ -1,7 +1,7 @@
 use crate::{
     adapters::{
         channel_repository::{ChannelRepository, DbChannelRepository},
-        utils::get_test_database_connection,
+        utils::get_db_conn,
     },
     domain::{channel::NewChannel, user::NewUser},
 };
@@ -13,7 +13,7 @@ pub fn create_test_user<'a>() -> NewUser<'a> {
 }
 
 pub fn create_test_user_in_db() -> i32 {
-    let conn = &mut get_test_database_connection();
+    let conn = &mut get_db_conn();
     let mut repo = DbChannelRepository { conn };
     let user = create_test_user();
     let user_id = repo.add_user(&user);
@@ -28,7 +28,7 @@ pub fn create_test_channel<'a>() -> NewChannel<'a> {
 }
 
 pub fn create_test_channel_in_db() -> i32 {
-    let conn = &mut get_test_database_connection();
+    let conn = &mut get_db_conn();
     let mut repo = DbChannelRepository { conn };
     let channel = create_test_channel();
     let channel_id = repo.add_channel(&channel);

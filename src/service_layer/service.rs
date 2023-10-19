@@ -56,7 +56,6 @@ mod test {
     use crate::adapters::channel_repository::{ChannelRepository, DbChannelRepository};
     use crate::adapters::user_repository::{DbUserRepository, UserRepository};
     use crate::adapters::utils::init_db;
-    use crate::domain::channel::NewChannel;
     use crate::service_layer::service::{
         authenticate_user, create_message, create_user, grant_user_access_to_channel,
     };
@@ -94,8 +93,6 @@ mod test {
 
         let user_id = create_test_user_in_db();
         let channel_id = create_test_channel_in_db();
-        println!("{}", user_id);
-        println!("{}", channel_id);
         grant_user_access_to_channel(&user_id, &channel_id, &mut repo);
 
         // when
@@ -115,19 +112,14 @@ mod test {
 
         // note: we are not creating an entry in the db for the user to be permitted to post on
         // this channel
-        let user = create_test_user();
-        repo.add_user(&user);
-        let channel = NewChannel {
-            name: &"fake channel",
-            description: &"a channel",
-        };
-        repo.add_channel(&channel);
+        let user_id = create_test_user_in_db();
+        let channel_id = create_test_channel_in_db();
 
         // when
-        create_message(&1, &1, &"something", &mut repo);
+        create_message(&user_id, &channel_id, &"something", &mut repo);
 
         // then
-        // todo: create_message should notify that the message was not created
+        // todo: create_message should not silently fail, and instead notify that the message was not created
         let result = repo.get_message_by_id(&1);
         assert!(result.is_none());
     }
