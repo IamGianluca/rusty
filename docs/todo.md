@@ -7,9 +7,9 @@
 - [ ] Client can update credentials via HTTP request to Server
 - [ ] Client can join a public channel via HTTP request to Server
 - [x] Client can create new channel via HTTP request to Server
-- [ ] Only authorized client can create new channel via HTTP request to Server
+- [ ] Only authorized user can create new channel via HTTP request to Server
 - [x] Client can send a message in a channel via HTTP request to Server
-- [ ] Only authorized client can send a message in a channel via HTTP request to Server
+- [x] Only authorized user can send a message in a channel via HTTP request to Server
 - [ ] Client receives new messages to a channel they are subscribed via WebSocket from Message Server
 
 #### Refactoring
