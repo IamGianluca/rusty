@@ -4,20 +4,20 @@ use crate::domain::channel::{Channel, NewChannel};
 use crate::domain::message::{Message, NewMessage};
 use crate::domain::user::{NewUser, User};
 
-pub trait MessageRepository {
+pub trait ChannelRepository {
     fn add_user(&mut self, user: &NewUser) -> i32;
-    fn get_user_by_id(&mut self, user_id: i32) -> Option<User>;
+    fn get_user_by_id(&mut self, user_id: &i32) -> Option<User>;
     fn add_channel(&mut self, channel: &NewChannel) -> i32;
-    fn get_channel_by_id(&mut self, channel_id: i32) -> Option<Channel>;
+    fn get_channel_by_id(&mut self, channel_id: &i32) -> Option<Channel>;
     fn add_message(&mut self, message: &NewMessage) -> i32;
-    fn get_message_by_id(&mut self, message_id: i32) -> Option<Message>;
+    fn get_message_by_id(&mut self, message_id: &i32) -> Option<Message>;
 }
 
-pub struct DbMessageRepository<'a> {
+pub struct DbChannelRepository<'a> {
     pub conn: &'a mut PgConnection,
 }
 
-impl MessageRepository for DbMessageRepository<'_> {
+impl ChannelRepository for DbChannelRepository<'_> {
     // user
     fn add_user(&mut self, user: &NewUser) -> i32 {
         use crate::adapters::schema::users::dsl::*;
@@ -28,7 +28,7 @@ impl MessageRepository for DbMessageRepository<'_> {
             .unwrap();
         row_inserted.id
     }
-    fn get_user_by_id(&mut self, user_id: i32) -> Option<User> {
+    fn get_user_by_id(&mut self, user_id: &i32) -> Option<User> {
         use crate::adapters::schema::users::dsl::*;
 
         users.filter(id.eq(user_id)).first(&mut *self.conn).ok()
@@ -45,7 +45,7 @@ impl MessageRepository for DbMessageRepository<'_> {
         row_inserted.id
     }
 
-    fn get_channel_by_id(&mut self, channel_id: i32) -> Option<Channel> {
+    fn get_channel_by_id(&mut self, channel_id: &i32) -> Option<Channel> {
         use crate::adapters::schema::channels::dsl::*;
 
         channels
@@ -65,7 +65,7 @@ impl MessageRepository for DbMessageRepository<'_> {
         row_inserted.id
     }
 
-    fn get_message_by_id(&mut self, message_id: i32) -> Option<Message> {
+    fn get_message_by_id(&mut self, message_id: &i32) -> Option<Message> {
         use crate::adapters::schema::messages::dsl::*;
 
         messages

@@ -34,7 +34,7 @@ struct ChannelPayload {
 #[post("/channel")]
 async fn create_channel_endpoint(info: web::Json<ChannelPayload>) -> impl Responder {
     let conn = &mut crate::adapters::utils::get_database_connection();
-    let repo = &mut crate::adapters::message_repository::DbMessageRepository { conn };
+    let repo = &mut crate::adapters::channel_repository::DbChannelRepository { conn };
     service_layer::service::create_channel(&info.name, &info.description, repo);
     HttpResponse::Ok()
 }
@@ -48,7 +48,7 @@ struct MessagePayload {
 #[post("/message")]
 async fn create_message_endpoint(info: web::Json<MessagePayload>) -> impl Responder {
     let conn = &mut crate::adapters::utils::get_database_connection();
-    let repo = &mut crate::adapters::message_repository::DbMessageRepository { conn };
+    let repo = &mut crate::adapters::channel_repository::DbChannelRepository { conn };
 
     service_layer::service::create_message(
         &info.user_id.parse::<i32>().unwrap(),

@@ -1,5 +1,5 @@
 use crate::{
-    adapters::{message_repository::MessageRepository, user_repository::UserRepository},
+    adapters::{channel_repository::ChannelRepository, user_repository::UserRepository},
     domain::{auth::NewPassword, channel::NewChannel, message::NewMessage, user::NewUser},
 };
 
@@ -21,7 +21,7 @@ pub fn create_user(username: &str, email: &str, password: &str, repo: &mut dyn U
     let _ = repo.add_password(&creds);
 }
 
-pub fn create_channel(name: &str, description: &str, repo: &mut dyn MessageRepository) {
+pub fn create_channel(name: &str, description: &str, repo: &mut dyn ChannelRepository) {
     let channel = NewChannel { name, description };
     let _ = repo.add_channel(&channel);
 }
@@ -30,7 +30,7 @@ pub fn create_message(
     user_id: &i32,
     channel_id: &i32,
     content: &str,
-    repo: &mut dyn MessageRepository,
+    repo: &mut dyn ChannelRepository,
 ) {
     let message = NewMessage {
         channel_id,
@@ -42,7 +42,7 @@ pub fn create_message(
 
 #[cfg(test)]
 mod test {
-    use crate::adapters::message_repository::{DbMessageRepository, MessageRepository};
+    use crate::adapters::channel_repository::{ChannelRepository, DbChannelRepository};
     use crate::adapters::user_repository::{DbUserRepository, UserRepository};
     use crate::adapters::utils::get_new_test_database_connection;
     use crate::domain::channel::NewChannel;
@@ -77,7 +77,7 @@ mod test {
     fn test_service_create_message() {
         // given
         let conn = &mut get_new_test_database_connection();
-        let mut repo = DbMessageRepository { conn };
+        let mut repo = DbChannelRepository { conn };
 
         let user = create_test_user();
         repo.add_user(&user);
@@ -91,7 +91,7 @@ mod test {
         create_message(&1, &1, &"something", &mut repo);
 
         // then
-        let result = repo.get_message_by_id(1);
+        let result = repo.get_message_by_id(&1);
         assert!(result.is_some());
         assert_eq!(result.unwrap().content, "something")
     }

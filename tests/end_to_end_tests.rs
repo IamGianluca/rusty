@@ -1,5 +1,5 @@
 use actix_web::{test, App};
-use rusty::adapters::{message_repository::MessageRepository, user_repository::UserRepository};
+use rusty::adapters::{channel_repository::ChannelRepository, user_repository::UserRepository};
 use serde_json::json;
 
 fn create_test_user() -> i32 {
@@ -13,10 +13,10 @@ fn create_test_user() -> i32 {
 
 fn create_test_channel() -> i32 {
     let conn = &mut rusty::adapters::utils::get_test_database_connection();
-    let repo = &mut rusty::adapters::message_repository::DbMessageRepository { conn };
+    let repo = &mut rusty::adapters::channel_repository::DbChannelRepository { conn };
 
     rusty::service_layer::service::create_channel("test channel", "a test channel", repo);
-    let channel = repo.get_channel_by_id(1).unwrap();
+    let channel = repo.get_channel_by_id(&1).unwrap();
     channel.id
 }
 
