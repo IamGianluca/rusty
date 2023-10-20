@@ -86,6 +86,25 @@ mod test {
     }
 
     #[test]
+    fn test_user_joins_a_channel() {
+        // given
+        let conn = &mut init_db();
+        let mut repo = DbChannelRepository { conn };
+
+        let user_id = create_test_user_in_db();
+        let channel_id = create_test_channel_in_db();
+
+        // then: user does not have permission yet
+        assert!(!repo.can_user_send_message(&user_id, &channel_id));
+
+        // when
+        grant_user_access_to_channel(&user_id, &channel_id, &mut repo);
+
+        // then
+        assert!(repo.can_user_send_message(&user_id, &channel_id))
+    }
+
+    #[test]
     fn test_service_create_message() {
         // given
         let conn = &mut init_db();

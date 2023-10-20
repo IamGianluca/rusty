@@ -5,7 +5,7 @@
 - [x] Client can sign up via HTTP request to Server 
 - [ ] Client can login/authenticate via HTTP request to Server
 - [ ] Client can update credentials via HTTP request to Server
-- [ ] Client can join a public channel via HTTP request to Server
+- [x] Client can join a public channel via HTTP request to Server
 - [x] Client can create new channel via HTTP request to Server
 - [ ] Only authorized user can create new channel via HTTP request to Server
 - [x] Client can send a message in a channel via HTTP request to Server
