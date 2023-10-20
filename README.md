@@ -4,6 +4,25 @@
 
 ### How to use
 
+Before starting the service, you will need to start the database and apply all migrations.
+
+```bash
+$ make start_db
+$ make prepare_db
+```
+
+You can then start the service with the following command:
+
+```bash
+$ cargo run
+```
+
+You will be able to start sending HTTP request to the service using this format:
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"name": "channel name", "description": "test channel"}' http://127.0.0.1:8080/channel
+```
+
 ### How to contribute
 
 This is really a pet project to learn Rust, so I'm not expecting anyone to be seriously interested in contributing. That said, if you are, please respect this naming convention to tag your commits:
