@@ -3,7 +3,7 @@
 #### Features
 
 - [x] Client can sign up via HTTP request to Server 
-- [ ] Client can login/authenticate via HTTP request to Server
+- [x] Client can login/authenticate via HTTP request to Server
 - [ ] Client can update credentials via HTTP request to Server
 - [x] Client can join a public channel via HTTP request to Server
 - [x] Client can create new channel via HTTP request to Server
@@ -18,8 +18,8 @@
 
 #### Testing
 
-- [ ] Integration tests for `MessageRepository`
-- [ ] Create in-memory version of `UserRepository` and `MessageRepository` to speed up test suite
+- [ ] Integration tests for `ChannelRepository`
+- [ ] Create in-memory version of `UserRepository` and `ChannelRepository` to speed up test suite
 
 #### Load Testing
 
