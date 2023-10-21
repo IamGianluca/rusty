@@ -1,5 +1,8 @@
 use actix_web::{test, App};
-use rusty::adapters::{channel_repository::ChannelRepository, user_repository::UserRepository};
+use rusty::{
+    adapters::{channel_repository::ChannelRepository, user_repository::UserRepository},
+    utils::create_test_user_in_db,
+};
 use serde_json::json;
 
 fn create_test_user() -> i32 {
@@ -85,8 +88,6 @@ async fn test_add_message_endpoint() {
     let channel_id = create_test_channel();
 
     // when
-    println!("{}", user_id);
-    println!("{}", channel_id);
     let payload = json!({
             "user_id": user_id.to_string(),
             "channel_id": channel_id.to_string(),
@@ -94,6 +95,28 @@ async fn test_add_message_endpoint() {
     });
     let req = test::TestRequest::post()
         .uri("/message")
+        .set_json(&payload)
+        .to_request();
+    let resp = test::call_service(&app, req).await;
+
+    // then
+    assert!(resp.status().is_success());
+}
+
+#[actix_web::test]
+async fn test_authenticate_endpoint() {
+    // given
+    rusty::adapters::utils::rebuild_db();
+    let app = test::init_service(App::new().service(rusty::authenticate_user_endpoint)).await;
+    let _ = create_test_user_in_db();
+
+    // when
+    let payload = json!({
+            "username": "John Doe",
+            "password": "password",
+    });
+    let req = test::TestRequest::get()
+        .uri("/authenticate")
         .set_json(&payload)
         .to_request();
     let resp = test::call_service(&app, req).await;

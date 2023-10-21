@@ -3,10 +3,17 @@ use crate::{
     domain::{auth::NewPassword, channel::NewChannel, message::NewMessage, user::NewUser},
 };
 
-pub fn authenticate_user(user: &str, repo: &mut dyn UserRepository) -> bool {
-    match repo.get_user_by_name(user) {
-        Some(_) => true,
-        None => false,
+pub fn authenticate_user(username: &str, password: &str, repo: &mut dyn UserRepository) -> bool {
+    match repo.get_user_by_name(username) {
+        Some(user) => {
+            let pass = repo.get_password_by_user_id(user.id).unwrap();
+            if pass.password == password {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        None => return false,
     }
 }
 
@@ -18,7 +25,12 @@ pub fn grant_user_access_to_channel(
     repo.grant_user_access_to_channel(user_id, channel_id);
 }
 
-pub fn create_user(username: &str, email: &str, password: &str, repo: &mut dyn UserRepository) {
+pub fn create_user(
+    username: &str,
+    email: &str,
+    password: &str,
+    repo: &mut dyn UserRepository,
+) -> i32 {
     // todo: this operation should be done as one transaction
     let user = NewUser { username, email };
     let user_id = repo.add_user(&user);
@@ -27,6 +39,7 @@ pub fn create_user(username: &str, email: &str, password: &str, repo: &mut dyn U
         password,
     };
     let _ = repo.add_password(&creds);
+    user_id
 }
 
 pub fn create_channel(name: &str, description: &str, repo: &mut dyn ChannelRepository) {
@@ -60,7 +73,7 @@ mod test {
         authenticate_user, create_message, create_user, grant_user_access_to_channel,
     };
 
-    use crate::utils::{create_test_channel_in_db, create_test_user, create_test_user_in_db};
+    use crate::utils::{create_test_channel_in_db, create_test_user_in_db};
     #[test]
     fn test_service_create_user() {
         // given
@@ -150,17 +163,16 @@ mod test {
         let mut repo = DbUserRepository { conn };
 
         // when
-        let response = authenticate_user("John Doe", &mut repo);
+        let response = authenticate_user("John Doe", "password", &mut repo);
 
         // then
         assert!(!response);
 
         // given
-        let user = create_test_user();
-        repo.add_user(&user);
+        create_user("John Doe", "johndoe@example.com", "password", &mut repo);
 
         // when
-        let response = authenticate_user("John Doe", &mut repo);
+        let response = authenticate_user("John Doe", "password", &mut repo);
 
         // then
         assert!(response);

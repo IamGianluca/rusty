@@ -27,6 +27,19 @@ async fn create_user_endpoint(info: web::Json<UserPayload>) -> impl Responder {
 }
 
 #[derive(Deserialize)]
+struct LoginPayload {
+    username: String,
+    password: String,
+}
+#[get("/authenticate")]
+async fn authenticate_user_endpoint(info: web::Json<LoginPayload>) -> impl Responder {
+    let conn = &mut crate::adapters::utils::get_db_conn();
+    let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
+    service_layer::service::authenticate_user(&info.username, &info.password, repo);
+    HttpResponse::Ok()
+}
+
+#[derive(Deserialize)]
 struct ChannelPayload {
     name: String,
     description: String,
@@ -65,6 +78,7 @@ pub async fn run() -> std::io::Result<()> {
         App::new()
             .service(hello)
             .service(create_user_endpoint)
+            .service(authenticate_user_endpoint)
             .service(create_channel_endpoint)
             .service(create_message_endpoint)
     })
