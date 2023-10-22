@@ -1,4 +1,4 @@
-use crate::domain::auth::{NewPassword, Password};
+use crate::domain::auth::{Credential, NewCredential};
 use crate::domain::user::{NewUser, User};
 use diesel::prelude::*;
 use diesel::{self, PgConnection};
@@ -7,8 +7,8 @@ pub trait UserRepository {
     fn add_user(&mut self, user: &NewUser) -> i32;
     fn get_user_by_id(&mut self, id: i32) -> Option<User>;
     fn get_user_by_name(&mut self, name: &str) -> Option<User>;
-    fn add_password(&mut self, credential: &NewPassword) -> i32;
-    fn get_password_by_user_id(&mut self, user_id: i32) -> Option<Password>;
+    fn add_credential(&mut self, credential: &NewCredential) -> i32;
+    fn get_credential_by_user_id(&mut self, user_id: i32) -> Option<Credential>;
     fn get_all(&mut self) -> Option<Vec<User>>;
 }
 
@@ -41,21 +41,21 @@ impl UserRepository for DbUserRepository<'_> {
             .ok()
     }
 
-    fn add_password(&mut self, credential: &NewPassword) -> i32 {
+    fn add_credential(&mut self, credential: &NewCredential) -> i32 {
         use crate::adapters::schema::credentials::dsl::*;
 
-        let inserted_password = diesel::insert_into(credentials)
+        let inserted_credential = diesel::insert_into(credentials)
             .values(credential)
-            .get_result::<Password>(&mut *self.conn);
-        inserted_password.unwrap().id
+            .get_result::<Credential>(&mut *self.conn);
+        inserted_credential.unwrap().id
     }
 
-    fn get_password_by_user_id(&mut self, _user_id: i32) -> Option<Password> {
+    fn get_credential_by_user_id(&mut self, _user_id: i32) -> Option<Credential> {
         use crate::adapters::schema::credentials::dsl::*;
 
         credentials
             .filter(user_id.eq(_user_id))
-            .first::<Password>(&mut *self.conn)
+            .first::<Credential>(&mut *self.conn)
             .ok()
     }
 

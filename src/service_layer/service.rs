@@ -1,13 +1,13 @@
 use crate::{
     adapters::{channel_repository::ChannelRepository, user_repository::UserRepository},
-    domain::{auth::NewPassword, channel::NewChannel, message::NewMessage, user::NewUser},
+    domain::{auth::NewCredential, channel::NewChannel, message::NewMessage, user::NewUser},
 };
 
 pub fn authenticate_user(username: &str, password: &str, repo: &mut dyn UserRepository) -> bool {
     match repo.get_user_by_name(username) {
         Some(user) => {
-            let pass = repo.get_password_by_user_id(user.id).unwrap();
-            if pass.password == password {
+            let credentials = repo.get_credential_by_user_id(user.id).unwrap();
+            if credentials.password == password {
                 return true;
             } else {
                 return false;
@@ -34,11 +34,11 @@ pub fn create_user(
     // todo: this operation should be done as one transaction
     let user = NewUser { username, email };
     let user_id = repo.add_user(&user);
-    let creds = NewPassword {
+    let creds = NewCredential {
         user_id: &user_id,
         password,
     };
-    let _ = repo.add_password(&creds);
+    let _ = repo.add_credential(&creds);
     user_id
 }
 
@@ -94,7 +94,7 @@ mod test {
         let retrieved_user = &result[1];
         assert_eq!(retrieved_user.username, "Jane Doe");
         assert_eq!(retrieved_user.email, "janedoe@example.com");
-        let result = repo.get_password_by_user_id(retrieved_user.id).unwrap();
+        let result = repo.get_credential_by_user_id(retrieved_user.id).unwrap();
         assert_eq!(result.password, "xxxxxxxx")
     }
 
