@@ -20,7 +20,7 @@ $ cargo run
 You will be able to start sending HTTP request to the service using this format:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"name": "channel name", "description": "test channel"}' http://127.0.0.1:8080/channel
+$ curl -X POST -H "Content-Type: application/json" -d '{"name": "channel name", "description": "test channel"}' http://127.0.0.1:8080/channel
 ```
 
 ### How to contribute
