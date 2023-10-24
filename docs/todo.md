@@ -4,7 +4,8 @@
 
 - [x] Client can sign up via HTTP request to Server 
 - [x] Client can login/authenticate via HTTP request to Server
-- [ ] Client can update credentials via HTTP request to Server
+- [ ] Before any operation, check that the user is authenticated (either a list of authorized users or an instance variable on the User struct)
+- [x] Client can update credentials via HTTP request to Server
 - [x] Client can join a public channel via HTTP request to Server
 - [x] Client can create new channel via HTTP request to Server
 - [ ] Only authorized user can create new channel via HTTP request to Server

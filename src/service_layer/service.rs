@@ -42,6 +42,30 @@ pub fn create_user(
     user_id
 }
 
+pub fn update_credentials(
+    user_id: &str,
+    old_password: &str,
+    new_password: &str,
+    repo: &mut dyn UserRepository,
+) -> bool {
+    let user_id = user_id.parse::<i32>().unwrap();
+    match repo.get_credential_by_user_id(user_id) {
+        Some(creds) => {
+            if creds.password == old_password {
+                let new_credential = NewCredential {
+                    user_id: &user_id,
+                    password: new_password,
+                };
+                repo.update_credentials(&new_credential);
+                true
+            } else {
+                return false;
+            }
+        }
+        None => return false,
+    }
+}
+
 pub fn create_channel(name: &str, description: &str, repo: &mut dyn ChannelRepository) {
     let channel = NewChannel { name, description };
     let _ = repo.add_channel(&channel);

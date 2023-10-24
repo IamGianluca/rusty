@@ -8,6 +8,7 @@ pub trait UserRepository {
     fn get_user_by_id(&mut self, id: i32) -> Option<User>;
     fn get_user_by_name(&mut self, name: &str) -> Option<User>;
     fn add_credential(&mut self, credential: &NewCredential) -> i32;
+    fn update_credentials(&mut self, credential: &NewCredential);
     fn get_credential_by_user_id(&mut self, user_id: i32) -> Option<Credential>;
     fn get_all(&mut self) -> Option<Vec<User>>;
 }
@@ -50,6 +51,15 @@ impl UserRepository for DbUserRepository<'_> {
         inserted_credential.unwrap().id
     }
 
+    fn update_credentials(&mut self, credential: &NewCredential) {
+        use crate::adapters::schema::credentials::dsl::*;
+
+        let _ = diesel::update(credentials)
+            .filter(user_id.eq(credential.user_id))
+            .set(password.eq(credential.password))
+            .execute(&mut *self.conn);
+    }
+
     fn get_credential_by_user_id(&mut self, _user_id: i32) -> Option<Credential> {
         use crate::adapters::schema::credentials::dsl::*;
 
@@ -70,7 +80,8 @@ impl UserRepository for DbUserRepository<'_> {
 mod test {
     use crate::adapters::user_repository::{DbUserRepository, UserRepository};
     use crate::adapters::utils::init_db;
-    use crate::utils::create_test_user;
+    use crate::domain::auth::NewCredential;
+    use crate::utils::{create_test_user, create_test_user_in_db};
 
     #[test]
     fn test_create_method() {
@@ -114,6 +125,7 @@ mod test {
         // then
         assert_eq!(retrieved_user.username, new_user.username)
     }
+
     #[test]
     fn test_get_user_by_name() {
         // given
@@ -128,5 +140,29 @@ mod test {
 
         // then
         assert_eq!(retrieved_user.username, new_user.username)
+    }
+
+    #[test]
+    fn test_update_credentials_for_existing_user() {
+        // given
+        let conn = &mut init_db();
+
+        let mut repo = DbUserRepository { conn };
+        let user_id = create_test_user_in_db();
+
+        // then
+        let res = repo.get_credential_by_user_id(user_id).unwrap();
+        assert_eq!(res.password, "password");
+
+        // when
+        let new_creds = NewCredential {
+            user_id: &user_id,
+            password: "new_password",
+        };
+        repo.update_credentials(&new_creds);
+
+        // then
+        let res = repo.get_credential_by_user_id(user_id).unwrap();
+        assert_eq!(res.password, "new_password")
     }
 }

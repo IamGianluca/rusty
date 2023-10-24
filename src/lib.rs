@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, post, put, web, App, HttpResponse, HttpServer, Responder};
 use serde::Deserialize;
 
 pub mod adapters;
@@ -27,10 +27,31 @@ async fn create_user_endpoint(info: web::Json<UserPayload>) -> impl Responder {
 }
 
 #[derive(Deserialize)]
+struct CredentialsPayload {
+    user_id: String,
+    old_password: String,
+    new_password: String,
+}
+
+#[put("/credentials")]
+async fn update_credentials_endpoint(info: web::Json<CredentialsPayload>) -> impl Responder {
+    let conn = &mut crate::adapters::utils::get_db_conn();
+    let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
+    service_layer::service::update_credentials(
+        &info.user_id,
+        &info.old_password,
+        &info.new_password,
+        repo,
+    );
+    HttpResponse::Ok()
+}
+
+#[derive(Deserialize)]
 struct LoginPayload {
     username: String,
     password: String,
 }
+
 #[get("/authenticate")]
 async fn authenticate_user_endpoint(info: web::Json<LoginPayload>) -> impl Responder {
     let conn = &mut crate::adapters::utils::get_db_conn();
@@ -78,6 +99,7 @@ pub async fn run() -> std::io::Result<()> {
         App::new()
             .service(hello)
             .service(create_user_endpoint)
+            .service(update_credentials_endpoint)
             .service(authenticate_user_endpoint)
             .service(create_channel_endpoint)
             .service(create_message_endpoint)

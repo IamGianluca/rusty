@@ -124,3 +124,26 @@ async fn test_authenticate_endpoint() {
     // then
     assert!(resp.status().is_success());
 }
+
+#[actix_web::test]
+async fn test_update_credentials_endpoint() {
+    // given
+    rusty::adapters::utils::rebuild_db();
+    let app = test::init_service(App::new().service(rusty::update_credentials_endpoint)).await;
+    let user_id = create_test_user_in_db();
+
+    // when
+    let payload = json!({
+            "user_id": user_id.to_string(),
+            "old_password": "password",
+            "new_password": "new_password",
+    });
+    let req = test::TestRequest::put()
+        .uri("/credentials")
+        .set_json(&payload)
+        .to_request();
+    let resp = test::call_service(&app, req).await;
+
+    // then
+    assert!(resp.status().is_success());
+}
