@@ -15,9 +15,11 @@ path = "src/lib.rs"
 
 [dependencies]
 actix-web = "4.4.0"
+actix-web-httpauth = "0.8.1"
 chrono = "0.4.31"
 diesel = { version = "2.1.0", features = ["postgres", "chrono"] }
 dotenvy = "0.15"
+jsonwebtoken = "9.1.0"
 serde = { version = "1.0", features = ["derive"] }
 
 [dev-dependencies]

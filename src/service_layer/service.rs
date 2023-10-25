@@ -3,20 +3,6 @@ use crate::{
     domain::{auth::NewCredential, channel::NewChannel, message::NewMessage, user::NewUser},
 };
 
-pub fn authenticate_user(username: &str, password: &str, repo: &mut dyn UserRepository) -> bool {
-    match repo.get_user_by_name(username) {
-        Some(user) => {
-            let credentials = repo.get_credential_by_user_id(user.id).unwrap();
-            if credentials.password == password {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        None => return false,
-    }
-}
-
 pub fn grant_user_access_to_channel(
     user_id: &i32,
     channel_id: &i32,
@@ -94,7 +80,7 @@ mod test {
     use crate::adapters::user_repository::{DbUserRepository, UserRepository};
     use crate::adapters::utils::init_db;
     use crate::service_layer::service::{
-        authenticate_user, create_message, create_user, grant_user_access_to_channel,
+        create_message, create_user, grant_user_access_to_channel,
     };
 
     use crate::utils::{create_test_channel_in_db, create_test_user_in_db};
@@ -178,27 +164,5 @@ mod test {
         // todo: create_message should not silently fail, and instead notify that the message was not created
         let result = repo.get_message_by_id(&1);
         assert!(result.is_none());
-    }
-
-    #[test]
-    fn test_service_authenticate_user() {
-        // given
-        let conn = &mut init_db();
-        let mut repo = DbUserRepository { conn };
-
-        // when
-        let response = authenticate_user("John Doe", "password", &mut repo);
-
-        // then
-        assert!(!response);
-
-        // given
-        create_user("John Doe", "johndoe@example.com", "password", &mut repo);
-
-        // when
-        let response = authenticate_user("John Doe", "password", &mut repo);
-
-        // then
-        assert!(response);
     }
 }

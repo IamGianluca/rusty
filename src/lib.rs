@@ -1,4 +1,6 @@
+use actix_web::Result;
 use actix_web::{get, post, put, web, App, HttpResponse, HttpServer, Responder};
+use actix_web_httpauth::extractors::bearer::BearerAuth;
 use serde::Deserialize;
 
 pub mod adapters;
@@ -53,11 +55,18 @@ struct LoginPayload {
 }
 
 #[get("/authenticate")]
-async fn authenticate_user_endpoint(info: web::Json<LoginPayload>) -> impl Responder {
+async fn authenticate_user_endpoint(
+    data: web::Json<LoginPayload>,
+    creds: BearerAuth,
+) -> Result<HttpResponse> {
     let conn = &mut crate::adapters::utils::get_db_conn();
     let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
-    service_layer::service::authenticate_user(&info.username, &info.password, repo);
-    HttpResponse::Ok()
+    let r = service_layer::authentication::validate_token(&creds.token());
+    if r.is_err() {
+        return Ok(HttpResponse::Forbidden().finish());
+    }
+    service_layer::authentication::authenticate_user(&data.username, &data.password, repo);
+    Ok(HttpResponse::Ok().finish())
 }
 
 #[derive(Deserialize)]
@@ -65,6 +74,7 @@ struct ChannelPayload {
     name: String,
     description: String,
 }
+
 #[post("/channel")]
 async fn create_channel_endpoint(info: web::Json<ChannelPayload>) -> impl Responder {
     let conn = &mut crate::adapters::utils::get_db_conn();
@@ -93,10 +103,17 @@ async fn create_message_endpoint(info: web::Json<MessagePayload>) -> impl Respon
     HttpResponse::Ok()
 }
 
+pub struct AppState {
+    pub secret_key: String,
+}
+
 #[actix_web::main]
 pub async fn run() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
+            .app_data(AppState {
+                secret_key: "secret".to_string(),
+            })
             .service(hello)
             .service(create_user_endpoint)
             .service(update_credentials_endpoint)
