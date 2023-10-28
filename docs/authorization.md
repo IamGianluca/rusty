@@ -21,3 +21,5 @@ JWTs are used for various purposes, including:
 - Information Exchange: JWTs are widely used for securely transmitting information between systems and services.
 
 It's important to note that JWTs are typically signed to ensure their integrity, but they are not encrypted. They should not be used to transmit sensitive information that needs to be kept confidential.
+
+For more information about JWT, please visit the [official page](https://jwt.io/introduction).
