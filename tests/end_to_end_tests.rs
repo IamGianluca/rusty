@@ -126,7 +126,7 @@ async fn test_authenticate_endpoint() {
     });
     use actix_web::http;
     let req = test::TestRequest::get()
-        .uri("/authenticate")
+        .uri("/login")
         .set_json(&payload)
         .insert_header((
             http::header::AUTHORIZATION,
@@ -161,7 +161,7 @@ async fn test_authenticate_endpoint_fail_wrong_token() {
     });
     use actix_web::http;
     let req = test::TestRequest::get()
-        .uri("/authenticate")
+        .uri("/login")
         .set_json(&payload)
         .insert_header((http::header::AUTHORIZATION, format!("Bearer {}", "secret")))
         .to_request();

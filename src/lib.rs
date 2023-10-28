@@ -54,7 +54,7 @@ struct LoginPayload {
     password: String,
 }
 
-#[get("/authenticate")]
+#[get("/login")]
 async fn authenticate_user_endpoint(
     data: web::Json<LoginPayload>,
     creds: BearerAuth,
