@@ -17,6 +17,7 @@
 
 - [ ] Use connection pool to connect to Postgres DB
 - [ ] The creation of a new user and password should happen within the same db transaction
+- [ ] Improve REST API design (e.g., passing values via path)
 
 #### Testing
 
