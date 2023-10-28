@@ -39,8 +39,10 @@ struct LoginPayload {
 async fn authenticate_user_endpoint(data: web::Json<LoginPayload>) -> HttpResponse {
     let conn = &mut crate::adapters::utils::get_db_conn();
     let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
-    service_layer::authenticate::authenticate_user(&data.username, &data.password, repo);
-    let token = service_layer::authenticate::create_token();
+    let user_id =
+        service_layer::authenticate::authenticate_user(&data.username, &data.password, repo)
+            .unwrap();
+    let token = service_layer::authenticate::generate_jwt_token(&user_id);
     HttpResponse::Ok().body(token)
 }
 

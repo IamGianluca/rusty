@@ -1,6 +1,6 @@
 use actix_web::http;
 use actix_web::{test, App};
-use rusty::service_layer::authenticate::get_secret_key;
+use rusty::service_layer::authenticate::{decode_token, get_secret_key};
 use rusty::{
     adapters::{channel_repository::ChannelRepository, user_repository::UserRepository},
     utils::create_test_user_in_db,
@@ -106,7 +106,7 @@ async fn test_add_message_endpoint() {
 }
 
 #[actix_web::test]
-async fn test_authenticate_endpoint() {
+async fn test_authenticate_user_endpoint() {
     // given
     rusty::adapters::utils::rebuild_db();
     use rusty::AppState;
@@ -134,8 +134,11 @@ async fn test_authenticate_endpoint() {
 
     // then
     assert!(resp.status().is_success());
-    let body_str = test::read_body(resp).await;
-    assert_eq!(body_str, get_secret_key())
+    let token_bytes = test::read_body(resp).await;
+    let token_string = String::from_utf8_lossy(&*token_bytes).to_string();
+    let secret_string = get_secret_key();
+    let result = decode_token(token_string, secret_string.as_bytes());
+    assert!(result.is_ok())
 }
 
 // #[actix_web::test]
