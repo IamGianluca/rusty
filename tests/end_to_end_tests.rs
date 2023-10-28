@@ -1,6 +1,3 @@
-use std::env;
-
-use actix_web::dev::ServiceResponse;
 use actix_web::http;
 use actix_web::{test, App};
 use rusty::service_layer::authenticate::get_secret_key;
@@ -253,7 +250,10 @@ async fn test_update_credentials_endpoint_fail_wrong_token() {
     let req = test::TestRequest::put()
         .uri("/credentials")
         .set_json(&payload)
-        .insert_header((http::header::AUTHORIZATION, format!("Bearer {}", "secret")))
+        .insert_header((
+            http::header::AUTHORIZATION,
+            format!("Bearer {}", "wrong_secret"),
+        ))
         .to_request();
     let resp = test::call_service(&app, req).await;
 

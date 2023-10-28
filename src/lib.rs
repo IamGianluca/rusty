@@ -1,7 +1,6 @@
 use actix_web::Result;
 use actix_web::{get, post, put, web, App, HttpResponse, HttpServer, Responder};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
-use diesel::migration::MigrationMetadata;
 use serde::Deserialize;
 use service_layer::authenticate::get_secret_key;
 
