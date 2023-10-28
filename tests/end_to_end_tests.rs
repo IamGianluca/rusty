@@ -1,4 +1,9 @@
+use std::env;
+
+use actix_web::dev::ServiceResponse;
+use actix_web::http;
 use actix_web::{test, App};
+use rusty::service_layer::authenticate::get_secret_key;
 use rusty::{
     adapters::{channel_repository::ChannelRepository, user_repository::UserRepository},
     utils::create_test_user_in_db,
@@ -124,53 +129,87 @@ async fn test_authenticate_endpoint() {
             "username": "John Doe",
             "password": "password",
     });
-    use actix_web::http;
-    let req = test::TestRequest::get()
-        .uri("/login")
+    let req = test::TestRequest::post()
+        .uri("/authenticate")
         .set_json(&payload)
-        .insert_header((
-            http::header::AUTHORIZATION,
-            format!("Bearer {}", "your-secret-key"),
-        ))
         .to_request();
     let resp = test::call_service(&app, req).await;
 
     // then
     assert!(resp.status().is_success());
+    let body_str = test::read_body(resp).await;
+    assert_eq!(body_str, get_secret_key())
 }
-#[actix_web::test]
-async fn test_authenticate_endpoint_fail_wrong_token() {
-    // given
-    rusty::adapters::utils::rebuild_db();
-    use rusty::AppState;
-    let app = test::init_service(
-        App::new()
-            // todo: this is not really being used - fix it!
-            .app_data(AppState {
-                secret_key: "secret".to_string(),
-            })
-            .service(rusty::authenticate_user_endpoint),
-    )
-    .await;
-    let _ = create_test_user_in_db();
 
-    // when
-    let payload = json!({
-            "username": "John Doe",
-            "password": "password",
-    });
-    use actix_web::http;
-    let req = test::TestRequest::get()
-        .uri("/login")
-        .set_json(&payload)
-        .insert_header((http::header::AUTHORIZATION, format!("Bearer {}", "secret")))
-        .to_request();
-    let resp = test::call_service(&app, req).await;
+// #[actix_web::test]
+// async fn test_authenticate_endpoint() {
+//     // given
+//     rusty::adapters::utils::rebuild_db();
+//     use rusty::AppState;
+//     let app = test::init_service(
+//         App::new()
+//             .app_data(AppState {
+//                 // todo: this is not really being used - fix it!
+//                 secret_key: "your-secret-key".to_string(),
+//             })
+//             .service(rusty::authenticate_user_endpoint),
+//     )
+//     .await;
+//     let _ = create_test_user_in_db();
+//
+//     // when
+//     let payload = json!({
+//             "username": "John Doe",
+//             "password": "password",
+//     });
+//     use actix_web::http;
+//     let req = test::TestRequest::post()
+//         .uri("/authenticate")
+//         .set_json(&payload)
+//         .insert_header((
+//             http::header::AUTHORIZATION,
+//             format!("Bearer {}", "your-secret-key"),
+//         ))
+//         .to_request();
+//     let resp = test::call_service(&app, req).await;
+//
+//     // then
+//     assert!(resp.status().is_success());
+// }
 
-    // then
-    println!("{}", resp.status());
-    assert_eq!(resp.status(), actix_web::http::StatusCode::FORBIDDEN);
-}
+// #[actix_web::test]
+// async fn test_authenticate_endpoint_fail_wrong_token() {
+//     // given
+//     rusty::adapters::utils::rebuild_db();
+//     use rusty::AppState;
+//     let app = test::init_service(
+//         App::new()
+//             // todo: this is not really being used - fix it!
+//             .app_data(AppState {
+//                 secret_key: "secret".to_string(),
+//             })
+//             .service(rusty::authenticate_user_endpoint),
+//     )
+//     .await;
+//     let _ = create_test_user_in_db();
+//
+//     // when
+//     let payload = json!({
+//             "username": "John Doe",
+//             "password": "password",
+//     });
+//     use actix_web::http;
+//     let req = test::TestRequest::post()
+//         .uri("/authenticate")
+//         .set_json(&payload)
+//         .insert_header((http::header::AUTHORIZATION, format!("Bearer {}", "secret")))
+//         .to_request();
+//     let resp = test::call_service(&app, req).await;
+//
+//     // then
+//     println!("{}", resp.status());
+//     assert_eq!(resp.status(), actix_web::http::StatusCode::FORBIDDEN);
+// }
 
 #[actix_web::test]
 async fn test_update_credentials_endpoint() {

@@ -54,20 +54,30 @@ struct LoginPayload {
     password: String,
 }
 
-#[get("/login")]
-async fn authenticate_user_endpoint(
-    data: web::Json<LoginPayload>,
-    creds: BearerAuth,
-) -> Result<HttpResponse> {
+#[post("/authenticate")]
+async fn authenticate_user_endpoint(data: web::Json<LoginPayload>) -> HttpResponse {
     let conn = &mut crate::adapters::utils::get_db_conn();
     let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
-    let r = service_layer::authentication::validate_token(&creds.token());
-    if r.is_err() {
-        return Ok(HttpResponse::Forbidden().finish());
-    }
-    service_layer::authentication::authenticate_user(&data.username, &data.password, repo);
-    Ok(HttpResponse::Ok().finish())
+    service_layer::authenticate::authenticate_user(&data.username, &data.password, repo);
+    let token = service_layer::authenticate::create_token();
+    HttpResponse::Ok().body(token)
 }
+
+// #[post("/authenticate")]
+// async fn authenticate_user_endpoint(
+//     data: web::Json<LoginPayload>,
+//     // creds: BearerAuth,
+// ) -> Result<HttpResponse> {
+//     let conn = &mut crate::adapters::utils::get_db_conn();
+//     let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
+//     // let r = service_layer::authentication::validate_token(&creds.token());
+//     // if r.is_err() {
+//     //     return Ok(HttpResponse::Forbidden().finish());
+//     // }
+//     service_layer::authentication::authenticate_user(&data.username, &data.password, repo);
+//     service_layer::authentication::create_token();
+//     Ok(HttpResponse::Ok().finish())
+// }
 
 #[derive(Deserialize)]
 struct ChannelPayload {
