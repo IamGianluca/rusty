@@ -5,7 +5,7 @@ use crate::adapters::user_repository::UserRepository;
 pub fn get_secret_key() -> String {
     use dotenvy::dotenv;
     dotenv().ok();
-    env::var("SECRET_KEY").expect("SECRET_KEY environment is not set.")
+    env::var("JWT_SECRET_KEY").expect("SECRET_KEY environment is not set.")
 }
 
 pub fn create_token() -> String {

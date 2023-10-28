@@ -7,7 +7,7 @@ on:
 env: 
   CARGO_TERM_COLOR: always
   DATABASE_URL: postgres://postgres:postgres@localhost/rusty
-  SECRET_KEY: my-secret-key
+  JWT_SECRET_KEY: my-secret-key
 
 jobs:
   build_and_test:

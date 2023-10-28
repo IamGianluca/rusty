@@ -1,7 +1,9 @@
 use actix_web::Result;
 use actix_web::{get, post, put, web, App, HttpResponse, HttpServer, Responder};
 use actix_web_httpauth::extractors::bearer::BearerAuth;
+use diesel::migration::MigrationMetadata;
 use serde::Deserialize;
+use service_layer::authenticate::get_secret_key;
 
 pub mod adapters;
 pub mod domain;
@@ -29,26 +31,6 @@ async fn create_user_endpoint(info: web::Json<UserPayload>) -> impl Responder {
 }
 
 #[derive(Deserialize)]
-struct CredentialsPayload {
-    user_id: String,
-    old_password: String,
-    new_password: String,
-}
-
-#[put("/credentials")]
-async fn update_credentials_endpoint(info: web::Json<CredentialsPayload>) -> impl Responder {
-    let conn = &mut crate::adapters::utils::get_db_conn();
-    let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
-    service_layer::service::update_credentials(
-        &info.user_id,
-        &info.old_password,
-        &info.new_password,
-        repo,
-    );
-    HttpResponse::Ok()
-}
-
-#[derive(Deserialize)]
 struct LoginPayload {
     username: String,
     password: String,
@@ -61,6 +43,33 @@ async fn authenticate_user_endpoint(data: web::Json<LoginPayload>) -> HttpRespon
     service_layer::authenticate::authenticate_user(&data.username, &data.password, repo);
     let token = service_layer::authenticate::create_token();
     HttpResponse::Ok().body(token)
+}
+
+#[derive(Deserialize)]
+struct CredentialsPayload {
+    user_id: String,
+    old_password: String,
+    new_password: String,
+}
+
+#[put("/credentials")]
+async fn update_credentials_endpoint(
+    info: web::Json<CredentialsPayload>,
+    creds: BearerAuth,
+) -> Result<HttpResponse> {
+    let conn = &mut crate::adapters::utils::get_db_conn();
+    let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
+    let r = service_layer::authenticate::validate_token(&creds.token());
+    if r.is_err() {
+        return Ok(HttpResponse::Forbidden().finish());
+    }
+    service_layer::service::update_credentials(
+        &info.user_id,
+        &info.old_password,
+        &info.new_password,
+        repo,
+    );
+    Ok(HttpResponse::Ok().finish())
 }
 
 // #[post("/authenticate")]
@@ -122,12 +131,12 @@ pub async fn run() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .app_data(AppState {
-                secret_key: "secret".to_string(),
+                secret_key: get_secret_key(),
             })
             .service(hello)
             .service(create_user_endpoint)
-            .service(update_credentials_endpoint)
             .service(authenticate_user_endpoint)
+            .service(update_credentials_endpoint)
             .service(create_channel_endpoint)
             .service(create_message_endpoint)
     })
