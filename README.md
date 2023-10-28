@@ -7,20 +7,20 @@
 Before starting the service, you will need to start the database and apply all migrations.
 
 ```bash
-$ make start_db
-$ make prepare_db
+make start_db
+make prepare_db
 ```
 
 You can then start the service with the following command:
 
 ```bash
-$ cargo run
+cargo run
 ```
 
 You will be able to start sending HTTP request to the service using this format:
 
 ```bash
-$ curl -X POST -H "Content-Type: application/json" -d '{"name": "channel name", "description": "test channel"}' http://127.0.0.1:8080/channel
+curl -X POST -H "Content-Type: application/json" -d '{"name": "channel name", "description": "test channel"}' http://127.0.0.1:8080/channel
 ```
 
 ### How to contribute
@@ -42,26 +42,26 @@ This is really a pet project to learn Rust, so I'm not expecting anyone to be se
 Before we start, we will need to install `diesel_cli` to help managing the project. If you're using Ubuntu, you can do that by running the following command:
 
 ```bash
-$ make install_diesel_cli
+make install_diesel_cli
 ```
 
 After that, we can start a Docker container running a Postgres server and apply the migrations to get the database to the desired state.
 
 ```bash
-$ make start_db
-$ make prepare_db
+make start_db
+make prepare_db
 ```
 
 We should now be able to run unit and integration tests.
 
 ```bash
-$ make test
+make test
 ```
 
 When we are done developing, we can stop the Docker container running Postgres.
 
 ```bash
-$ make stop_db
+make stop_db
 ```
 
 ### Tools
