@@ -167,6 +167,7 @@ async fn test_update_credentials_endpoint() {
     // then
     assert!(resp.status().is_success());
 }
+
 #[actix_web::test]
 async fn test_update_credentials_endpoint_fail_wrong_token() {
     // given
