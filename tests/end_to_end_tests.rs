@@ -199,7 +199,6 @@ async fn test_update_credentials_endpoint_fail_wrong_token() {
     // given
     rusty::adapters::utils::rebuild_db();
     let app = test::init_service(App::new().service(rusty::update_credentials_endpoint)).await;
-    // let user_id = create_test_user_in_db();
     let (user_id, _) = create_and_login_user();
 
     // when
