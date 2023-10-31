@@ -60,8 +60,9 @@ async fn update_credentials_endpoint(
 ) -> Result<HttpResponse> {
     let conn = &mut crate::adapters::utils::get_db_conn();
     let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
-    let r = service_layer::authenticate::decode_token(&*creds.token(), get_secret_key().as_bytes());
-    if r.is_err() {
+    let res =
+        service_layer::authenticate::decode_token(&*creds.token(), get_secret_key().as_bytes());
+    if res.is_err() {
         return Ok(HttpResponse::Unauthorized().finish());
     }
     service_layer::service::update_credentials(
@@ -80,11 +81,19 @@ struct ChannelPayload {
 }
 
 #[post("/channel")]
-async fn create_channel_endpoint(info: web::Json<ChannelPayload>) -> impl Responder {
+async fn create_channel_endpoint(
+    info: web::Json<ChannelPayload>,
+    creds: BearerAuth,
+) -> Result<HttpResponse> {
     let conn = &mut crate::adapters::utils::get_db_conn();
     let repo = &mut crate::adapters::channel_repository::DbChannelRepository { conn };
+    let res =
+        service_layer::authenticate::decode_token(&*creds.token(), get_secret_key().as_bytes());
+    if res.is_err() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
     service_layer::service::create_channel(&info.name, &info.description, repo);
-    HttpResponse::Ok()
+    Ok(HttpResponse::Ok().finish())
 }
 
 #[derive(Deserialize)]
@@ -94,9 +103,17 @@ struct MessagePayload {
     content: String,
 }
 #[post("/message")]
-async fn create_message_endpoint(info: web::Json<MessagePayload>) -> impl Responder {
+async fn create_message_endpoint(
+    info: web::Json<MessagePayload>,
+    creds: BearerAuth,
+) -> Result<HttpResponse> {
     let conn = &mut crate::adapters::utils::get_db_conn();
     let repo = &mut crate::adapters::channel_repository::DbChannelRepository { conn };
+    let res =
+        service_layer::authenticate::decode_token(&*creds.token(), get_secret_key().as_bytes());
+    if res.is_err() {
+        return Ok(HttpResponse::Unauthorized().finish());
+    }
 
     service_layer::service::create_message(
         &info.user_id.parse::<i32>().unwrap(),
@@ -104,7 +121,7 @@ async fn create_message_endpoint(info: web::Json<MessagePayload>) -> impl Respon
         &info.content,
         repo,
     );
-    HttpResponse::Ok()
+    Ok(HttpResponse::Ok().finish())
 }
 
 pub struct AppState {

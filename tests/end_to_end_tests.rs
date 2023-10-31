@@ -1,19 +1,13 @@
 use actix_web::http;
 use actix_web::{test, App};
 use rusty::service_layer::authenticate::{create_token, decode_token, get_secret_key};
-use rusty::{
-    adapters::{channel_repository::ChannelRepository, user_repository::UserRepository},
-    utils::create_test_user_in_db,
-};
+use rusty::{adapters::channel_repository::ChannelRepository, utils::create_test_user_in_db};
 use serde_json::json;
 
-fn create_test_user() -> i32 {
-    let conn = &mut rusty::adapters::utils::get_db_conn();
-    let repo = &mut rusty::adapters::user_repository::DbUserRepository { conn };
-
-    rusty::service_layer::service::create_user("John Doe", "johndoe@example.com", "password", repo);
-    let users = repo.get_all().unwrap();
-    users[0].id
+fn create_and_login_user() -> (i32, String) {
+    let user_id = create_test_user_in_db();
+    let token = create_token(&user_id.to_string(), get_secret_key().as_bytes(), 60).unwrap();
+    (user_id, token)
 }
 
 fn create_test_channel() -> i32 {
@@ -65,6 +59,7 @@ async fn test_add_channel_endpoint() {
     // given
     rusty::adapters::utils::rebuild_db();
     let app = test::init_service(App::new().service(rusty::create_channel_endpoint)).await;
+    let (_, token) = create_and_login_user();
 
     // when
     let payload = json!({
@@ -74,6 +69,7 @@ async fn test_add_channel_endpoint() {
     let req = test::TestRequest::post()
         .uri("/channel")
         .set_json(&payload)
+        .insert_header((http::header::AUTHORIZATION, format!("Bearer {}", token)))
         .to_request();
     let resp = test::call_service(&app, req).await;
 
@@ -86,7 +82,7 @@ async fn test_add_message_endpoint() {
     // given
     rusty::adapters::utils::rebuild_db();
     let app = test::init_service(App::new().service(rusty::create_message_endpoint)).await;
-    let user_id = create_test_user();
+    let (user_id, token) = create_and_login_user();
     let channel_id = create_test_channel();
 
     // when
@@ -98,6 +94,7 @@ async fn test_add_message_endpoint() {
     let req = test::TestRequest::post()
         .uri("/message")
         .set_json(&payload)
+        .insert_header((http::header::AUTHORIZATION, format!("Bearer {}", token)))
         .to_request();
     let resp = test::call_service(&app, req).await;
 
@@ -162,12 +159,6 @@ async fn test_update_credentials_endpoint_fail_no_token() {
 
     // then
     assert_eq!(resp.status(), actix_web::http::StatusCode::UNAUTHORIZED);
-}
-
-pub fn create_and_login_user() -> (i32, String) {
-    let user_id = create_test_user_in_db();
-    let token = create_token(&user_id.to_string(), get_secret_key().as_bytes(), 60).unwrap();
-    (user_id, token)
 }
 
 #[actix_web::test]
