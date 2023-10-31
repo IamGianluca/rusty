@@ -1,6 +1,6 @@
 use actix_web::http;
 use actix_web::{test, App};
-use rusty::service_layer::authenticate::{decode_token, get_secret_key};
+use rusty::service_layer::authenticate::{create_token, decode_token, get_secret_key};
 use rusty::{
     adapters::{channel_repository::ChannelRepository, user_repository::UserRepository},
     utils::create_test_user_in_db,
@@ -164,12 +164,18 @@ async fn test_update_credentials_endpoint_fail_no_token() {
     assert_eq!(resp.status(), actix_web::http::StatusCode::UNAUTHORIZED);
 }
 
+pub fn create_and_login_user() -> (i32, String) {
+    let user_id = create_test_user_in_db();
+    let token = create_token(&user_id.to_string(), get_secret_key().as_bytes(), 60).unwrap();
+    (user_id, token)
+}
+
 #[actix_web::test]
 async fn test_update_credentials_endpoint() {
     // given
     rusty::adapters::utils::rebuild_db();
     let app = test::init_service(App::new().service(rusty::update_credentials_endpoint)).await;
-    let user_id = create_test_user_in_db();
+    let (user_id, token) = create_and_login_user();
 
     // when
     let payload = json!({
@@ -180,10 +186,7 @@ async fn test_update_credentials_endpoint() {
     let req = test::TestRequest::put()
         .uri("/credentials")
         .set_json(&payload)
-        .insert_header((
-            http::header::AUTHORIZATION,
-            format!("Bearer {}", get_secret_key()),
-        ))
+        .insert_header((http::header::AUTHORIZATION, format!("Bearer {}", token)))
         .to_request();
     let resp = test::call_service(&app, req).await;
 
@@ -196,7 +199,8 @@ async fn test_update_credentials_endpoint_fail_wrong_token() {
     // given
     rusty::adapters::utils::rebuild_db();
     let app = test::init_service(App::new().service(rusty::update_credentials_endpoint)).await;
-    let user_id = create_test_user_in_db();
+    // let user_id = create_test_user_in_db();
+    let (user_id, _) = create_and_login_user();
 
     // when
     let payload = json!({

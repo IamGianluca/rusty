@@ -60,7 +60,7 @@ async fn update_credentials_endpoint(
 ) -> Result<HttpResponse> {
     let conn = &mut crate::adapters::utils::get_db_conn();
     let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
-    let r = service_layer::authenticate::validate_token(&creds.token());
+    let r = service_layer::authenticate::decode_token(&*creds.token(), get_secret_key().as_bytes());
     if r.is_err() {
         return Ok(HttpResponse::Unauthorized().finish());
     }

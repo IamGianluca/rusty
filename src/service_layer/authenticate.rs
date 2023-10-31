@@ -62,14 +62,6 @@ pub fn decode_token<T: Into<String>>(token: T, secret: &[u8]) -> Result<String, 
     }
 }
 
-pub fn validate_token(token: &str) -> Result<(), String> {
-    if token == get_secret_key() {
-        Ok(())
-    } else {
-        Err("Invalid token".to_string())
-    }
-}
-
 pub fn authenticate_user(
     username: &str,
     password: &str,
