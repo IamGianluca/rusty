@@ -18,7 +18,3 @@ pub struct NewCredential<'a> {
     pub user_id: &'a i32,
     pub password: &'a str,
 }
-
-// pub fn authenticate_user() -> bool {
-//     true
-// }
