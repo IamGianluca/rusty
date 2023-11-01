@@ -18,7 +18,8 @@ POSTGRES_CONTAINER_NAME=rusty_db
 Then, we must start the database and apply all migrations.
 
 ```bash
-make start_db && make prepare_db
+make start_db 
+make prepare_db
 ```
 
 We can then start the service with the following command:
@@ -58,7 +59,8 @@ make install_diesel_cli
 Then, we must start the app database and apply all migrations to get the database to the desired state.
 
 ```bash
-make start_db && make prepare_db
+make start_db 
+make prepare_db
 ```
 
 We should now be able to run unit and integration tests.
@@ -72,6 +74,8 @@ To stop the service, we can stop the Docker container running Postgres.
 ```bash
 make stop_db
 ```
+
+There are other helper commands in the `makefile` file that can be useful while contributing to this project.
 
 ### Tools
 
