@@ -8,7 +8,7 @@
 - [x] Client can join a public channel via HTTP request to Server
 - [x] Client can create a new channel via HTTP request to Server
 - [x] Client can send a message in a channel via HTTP request to Server
-- [ ] Before any operation, server verifies JWT auth
+- [x] Before any operation, server verifies JWT auth
 - [ ] Client gets notified of new messages to channel they are subscribed via WebSocket from Message Server
 
 #### Refactoring
