@@ -21,7 +21,7 @@ struct UserPayload {
     email: String,
 }
 
-#[post("/user")]
+#[post("/users")]
 async fn create_user_endpoint(info: web::Json<UserPayload>) -> impl Responder {
     let conn = &mut crate::adapters::utils::get_db_conn();
     let repo = &mut crate::adapters::user_repository::DbUserRepository { conn };
@@ -80,7 +80,7 @@ struct ChannelPayload {
     description: String,
 }
 
-#[post("/channel")]
+#[post("/channels")]
 async fn create_channel_endpoint(
     info: web::Json<ChannelPayload>,
     creds: BearerAuth,
@@ -102,7 +102,7 @@ struct MessagePayload {
     channel_id: String,
     content: String,
 }
-#[post("/message")]
+#[post("/messages")]
 async fn create_message_endpoint(
     info: web::Json<MessagePayload>,
     creds: BearerAuth,

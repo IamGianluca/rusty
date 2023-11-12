@@ -45,7 +45,7 @@ async fn test_add_user_endpoint() {
             "email": "johndoe@example.com"
     });
     let req = test::TestRequest::post()
-        .uri("/user")
+        .uri("/users")
         .set_json(&payload)
         .to_request();
     let resp = test::call_service(&app, req).await;
@@ -67,7 +67,7 @@ async fn test_add_channel_endpoint() {
             "description": "test channel"
     });
     let req = test::TestRequest::post()
-        .uri("/channel")
+        .uri("/channels")
         .set_json(&payload)
         .insert_header((http::header::AUTHORIZATION, format!("Bearer {}", token)))
         .to_request();
@@ -92,7 +92,7 @@ async fn test_add_message_endpoint() {
             "content": "this is a test message"
     });
     let req = test::TestRequest::post()
-        .uri("/message")
+        .uri("/messages")
         .set_json(&payload)
         .insert_header((http::header::AUTHORIZATION, format!("Bearer {}", token)))
         .to_request();
