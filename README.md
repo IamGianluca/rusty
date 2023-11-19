@@ -2,7 +2,13 @@
 
 `rusty` is a pet project aimed at learning Rust. The scope of this project is to create the backend for a simple, instant messaging app like Slack or Discord.
 
-### How to use
+Some features:
+* Written in Rust for blazing fast performance
+* Leverages one of the fastest HTTP web server in Actix Web
+* Uses Domain-Driven Design for a clear codebase that is easily extendible
+* Secure authentication with JSON Web Tokens
+
+### Installation
 
 Before starting the service, we must create a `.env` file. The `.env` file must contain the following environment variables.
 
@@ -34,7 +40,16 @@ We will be able to start sending HTTP requests to the service using this format:
 curl -X POST -H "Content-Type: application/json" -d '{"name": "channel name", "description": "test channel"}' http://127.0.0.1:8080/channel
 ```
 
-### How to contribute
+### Directory Structure
+
+* `src/adapters`: Adapters and repository classes.
+* `src/domain`: Domain model.
+* `src/service_layer`: Service layer.
+* `src/lib.rs`: REST API.
+* `src/main.rs`: The entry point to launch the app.
+
+
+### Development
 
 `rusty` is a pet project to learn Rust; thus, I do not expect external contributions. Yet, if you want to help, please respect this naming convention to tag your commits:
 
