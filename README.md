@@ -1,6 +1,8 @@
 ### Rusty 
 
-<img src="./imgs/logo.png" alt="Rusty logo" class="center" width=300 height=300>
+<p align="center"> 
+  <img src="./imgs/logo.png" alt="Rusty logo" class="center" width=300 height=300>
+</p>
 
 `rusty` is a pet project aimed at learning Rust. The scope of this project is to create the backend for a simple, instant messaging app like Slack or Discord.
 
